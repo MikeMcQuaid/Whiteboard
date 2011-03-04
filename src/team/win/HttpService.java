@@ -52,8 +52,6 @@ public class HttpService extends Service {
 	}
 	
 	private class Handler extends AbstractHandler {
-		
-		@Override
 		public void handle(String target, Request baseRequest, HttpServletRequest request,
 				HttpServletResponse response) throws IOException, ServletException {
 			if (target.equals("/")) {
