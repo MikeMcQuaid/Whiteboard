@@ -14,12 +14,13 @@ public class WhiteBoardView extends View {
 	}
 
 	public boolean onTouchEvent(MotionEvent e) {
-		return false;
+		return true;
 	}
 	
 	protected void onDraw(Canvas c) {
 		Paint paint = new Paint();
 		paint.setColor(Color.rgb(255, 255, 255));
-		c.drawArc(new RectF(0.0f, 0.0f, 200.0f, 200.0f), 0.0f, 0.0f, true, paint);
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		c.drawARGB(255, 255, 255, 255);
 	}
 }
