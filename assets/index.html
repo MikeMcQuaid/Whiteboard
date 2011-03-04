@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello world</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>The time sponsored by Android will read: <span id="time"></span></h1>
+<script>
+
+$(document).ready(function() {
+	var fetchTime = function() {
+		$.get('/time', function(time) {
+			$('#time').html(time);
+		});
+	};
+	window.setInterval(function () {
+		fetchTime();
+	}, 1000);
+});
+</script>
+</body>
+</html>
