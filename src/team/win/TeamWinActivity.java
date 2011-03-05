@@ -28,7 +28,8 @@ public class TeamWinActivity extends Activity {
 		try {
 			Log.i(TAG, mDataStore.getAllPrimitivesAsJSON());
 		} catch (JSONException e) {
-			throw new RuntimeException(e);
+			Log.e("EAJSNOOB", "ajs would have crashed the application here");
+			//throw new RuntimeException(e);
 		}
 		startService(makeServiceIntent());
 		logIpAddresses();
