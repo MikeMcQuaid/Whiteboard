@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Random;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -26,11 +25,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.Toast;
 
-public class WhiteBoardActivity extends Activity implements ColorPickerDialog.OnColorChangedListener {
+public class WhiteBoardActivity extends Activity {
 	
-	private static final int STROKE_WIDTH_DIALOG_ID = 1;
+	private static final int STROKE_WIDTH_DIALOG_ID = 0;
+	private static final int COLOR_PICKER_DIALOG_ID = 1;
+	
+	private static final Integer[] COLORS = { Color.BLACK, Color.DKGRAY,
+		Color.BLUE, Color.GREEN, Color.CYAN, Color.RED, Color.MAGENTA,
+		0xFFFF6800, Color.YELLOW, Color.LTGRAY, Color.GRAY, Color.WHITE, };
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
@@ -77,7 +88,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
-		intent.setClass(getApplicationContext(), HttpService.class);
+		intent.setClass(this, HttpService.class);
 		return intent;
 	}
 
@@ -92,6 +103,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
+			Toast.makeText(getApplicationContext(), "Implement me!", 3);
 			saveToSdcard();
 			return true;
 		case R.id.menu_load:
@@ -101,12 +113,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
 		case R.id.menu_color:
-			new ColorPickerDialog(this, this, mWhiteBoardView.getPaint().getColor()).show();
-			/*mWhiteBoardView.setPrimColor(
-				Color.argb(255,
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255)));*/
+			showDialog(COLOR_PICKER_DIALOG_ID);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -129,6 +136,30 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 				}
 			});
 			return builder.create();
+		case COLOR_PICKER_DIALOG_ID:
+			final Dialog dialog = new Dialog(this);
+			dialog.setTitle("Choose colour");
+			dialog.setContentView(R.layout.color_picker);
+			GridView gridView = (GridView) dialog.findViewById(R.id.color_picker_gridview);
+			gridView.setAdapter(new ArrayAdapter<Integer>(this, 0, COLORS) {
+				@Override
+				public View getView(int position, View convertView, ViewGroup parent) {
+					final int color = COLORS[position];
+					View colorView = new View(WhiteBoardActivity.this);
+					colorView.setMinimumWidth(45);
+					colorView.setMinimumHeight(45);
+					colorView.setBackgroundColor(color);
+					return colorView;
+				}
+			});
+			gridView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+					mWhiteBoardView.setPrimColor(COLORS[position]);
+					dialog.dismiss();
+				}
+			});
+			return dialog;
 		default:
 			return super.onCreateDialog(id);
 		}
@@ -207,8 +238,4 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 		return true;
 	}
 
-	@Override
-	public void colorChanged(int color) {
-		mWhiteBoardView.setPrimColor(color);
-	}
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridView xmlns:android="http://schemas.android.com/apk/res/android" 
+	android:id="@+id/color_picker_gridview"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
+	android:horizontalSpacing="10dp"
+	android:verticalSpacing="10dp"
+	android:numColumns="4"></GridView>
