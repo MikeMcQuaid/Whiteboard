@@ -75,6 +75,8 @@ var paint = function() {
 	canvas.height = canvas.height;
 
 	var context = canvas.getContext('2d');
+	context.lineCap = 'round';
+	context.lineJoin = 'round';
 	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
@@ -89,6 +91,8 @@ var paint = function() {
 		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
+	context.lineWidth = 1;
+	context.strokeStyle = '#000000';
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 	if (serverTime)
 		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
