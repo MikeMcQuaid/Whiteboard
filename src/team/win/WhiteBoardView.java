@@ -9,8 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.Region;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -139,8 +137,13 @@ public class WhiteBoardView extends View {
 	public void resetPoints() {
 		points = new LinkedList<Point>();
 	}
+	
+	public Paint getPaint()
+	{
+		return this.paint;
+	}
 
-	protected void setPrimColor(int c) {
+	public void setPrimColor(int c) {
 		paint.setColor(c);
 	}
 
