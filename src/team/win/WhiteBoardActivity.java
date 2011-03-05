@@ -103,7 +103,6 @@ public class WhiteBoardActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			Toast.makeText(getApplicationContext(), "Implement me!", 3);
 			saveToSdcard();
 			return true;
 		case R.id.menu_load:
@@ -114,6 +113,13 @@ public class WhiteBoardActivity extends Activity {
 			return true;
 		case R.id.menu_color:
 			showDialog(COLOR_PICKER_DIALOG_ID);
+			return true;
+		case R.id.menu_erase:
+			Toast.makeText(getApplicationContext(), "Implement me!", 3);
+			mWhiteBoardView.setPrimColor(Color.WHITE);
+			return true;
+		case R.id.menu_clear:
+			mWhiteBoardView.resetPoints();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
