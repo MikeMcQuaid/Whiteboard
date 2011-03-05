@@ -11,6 +11,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.Region;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,10 +29,13 @@ public class WhiteBoardView extends View {
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;
 
-	public void resetState() {
-		paint.reset();
-		path.reset();
+	public void resetPoints() {
 		points = new LinkedList<Point>();
+	}
+	
+	public void resetState() {
+		//paint.reset();
+		//path.reset();
 
 		// FIXME: Remove these hacks when we can configure
 		paint.setAntiAlias(true);
@@ -44,9 +49,12 @@ public class WhiteBoardView extends View {
 
 	public WhiteBoardView(Context context, DataStore ds) {
 		super(context);
-		bitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
+		bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().widthPixels, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
+		Log.i("WidthHeight", String.format("%d %d", getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels));
+		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
 		mDataStore = ds;
+		resetPoints();
 		resetState();
 	}
 
@@ -56,6 +64,7 @@ public class WhiteBoardView extends View {
 	}
 
 	private void touchStart(float x, float y) {
+		resetPoints();
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		points.add(new Point((int) x, (int) y));
 		path.moveTo(x, y);
@@ -77,14 +86,12 @@ public class WhiteBoardView extends View {
 
 	private void touchUp() {
 		path.lineTo(mX, mY);
-		canvas.drawPath(path, paint);
 		mDataStore.add(new Primitive(paint, points));
 		try {
 			System.out.println(mDataStore.getAllPrimitivesAsJSON());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		resetState();
 	}
 
 	@Override
