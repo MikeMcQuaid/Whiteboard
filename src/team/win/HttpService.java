@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 public class HttpService extends Service {
 	
+	public static final int PORT_NUMBER = 8080;
+
 	public class HttpServiceBinder extends Binder {
 		public HttpService getService() {
 			return HttpService.this;
@@ -32,7 +34,7 @@ public class HttpService extends Service {
 	private DataStore dataStore;
 
 	public HttpService() {
-		server = new Server(8080);
+		server = new Server(PORT_NUMBER);
 		server.setHandler(new Handler());
 	}
 	
