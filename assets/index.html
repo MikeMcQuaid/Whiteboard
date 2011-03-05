@@ -1,45 +1,89 @@
 <!DOCTYPE html>
-<html height="100%" width="100%" margin="0" padding="0">
+<html>
 <head>
-<title>Hello world</title>
+<title>Hello canvas</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-</head>
-<body height="100%" width="100%" margin="0" padding="0">
-<canvas id="canvas"></canvas>
-<script>
-
-var gotTime = 0;
-
-function paint() {
-	var canvas = $('#canvas')[0];
-	var context = canvas.getContext("2d");
-	var windowWidth = window.innerWidth;
-	var windowHeight = window.innerHeight;
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	context.strokeRect(0, 0, windowWidth/2, windowHeight/2);
-	var text = "The time sponsored by Android will read: "
-	text += gotTime;
-	context.fillText(text, 50, 50);
+<style>
+html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
 }
 
-$(window).resize(function() {
-	paint();
-});
+#canvas {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas">
+	Your browser does not support HTML5 canvas
+</canvas>
+
+<script>
+var serverTime = 0;
+var num = 0;
+var getBoard = function() {
+	// TODO Get it from the network!
+	var paths = []
+	switch (num) {
+	default:
+		paths.push({ strokeColor: '#cccccc', strokeWidth: 1, path: [0, 100, 100, 200, 200, 100] });
+	case 1:
+		paths.push({ strokeColor: '#FF0000', strokeWidth: 1, path: [0, 50, 100, 150, 200, 50] });
+	case 0:
+		paths.push({ strokeColor: '#000000', strokeWidth: 1, path: [0, 0, 100, 100, 200, 0] });
+	}
+	num++;
+	return { width: 800, height: 480, paths: paths };
+};
+
+var paint = function(canvas) {
+	canvas.width = window.innerWidth; // Clear and resize canvas
+	canvas.height = window.innerHeight;
+
+	var board = getBoard();
+	console.log('Redrawing: ' + board.width + ' ' + board.height);
+
+	// TODO bounds checking etc
+	var context = canvas.getContext('2d');
+	var windowWidth = window.innerWidth;
+	var windowHeight = window.innerHeight;
+	$.each(board.paths, function(index, path) {
+		context.beginPath();
+		for (var i = 0; i < (path.path.length / 2); i++) {
+			var point = path.path.slice(i * 2, (i * 2) + 2);
+			if (i == 0) {
+				context.moveTo(point[0], point[1]); // don't paint on first point
+			} else {
+				context.lineTo(point[0], point[1]);
+			}
+		}
+		context.strokeStyle = path.strokeColor;
+		context.stroke();
+	});
+	context.strokeRect(0, 0, windowWidth/2, windowHeight/2);
+	if (serverTime)
+		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
+};
 
 $(document).ready(function() {
 	var fetchTime = function() {
 		$.get('/time', function(time) {
 			$('#time').html(time);
-			gotTime = time;
+			serverTime = time;
 		});
 	};
-	window.setInterval(function () {
-		fetchTime();
-	}, 1000);
-	window.setInterval(function () {
-		paint();
-	}, 1000);
+	window.setInterval(fetchTime, 1000);
+	var canvas = $('#canvas')[0];
+	window.setInterval(paint, 1000, canvas);
+});
+
+$(window).resize(function() {
+	paint();
 });
 </script>
 </body>
