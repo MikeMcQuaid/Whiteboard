@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +21,8 @@ public class WhiteBoardView extends View {
     private List<Path> paths;
     private Paint currentPaint;
     private Path currentPath;
-
+	private DataStore mDataStore;
+    
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
     
@@ -38,7 +38,7 @@ public class WhiteBoardView extends View {
         return paint;
     }
     
-	public WhiteBoardView(Context context) {
+	public WhiteBoardView(Context context, DataStore ds) {
 		super(context);
 		bitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
@@ -46,6 +46,7 @@ public class WhiteBoardView extends View {
         currentPaint = paintBuilder();
         paints = new LinkedList<Paint>();
         paths = new LinkedList<Path>();
+		mDataStore = ds;
 	}
 	
     @Override
