@@ -21,6 +21,14 @@ public class DataStore {
 		return mPrimitiveList.add(p);
 	}
 
+	public Primitive remove(int index) {
+		return mPrimitiveList.remove(index);
+	}
+
+	public int size() {
+		return mPrimitiveList.size();
+	}
+
 	public String getAllPrimitivesAsJSON() throws JSONException {
 		JSONArray primitives = new JSONArray();
 		for (Primitive primitive : mPrimitiveList) {

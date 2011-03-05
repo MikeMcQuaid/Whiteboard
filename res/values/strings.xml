@@ -7,7 +7,7 @@
 	<string name="label_remoteurl">Access at: http:/%1$s</string>
 	<string name="menu_shutdown">Shutdown</string>
 	<string name="menu_save">Save</string>
-	<string name="menu_widget">Widget</string>
+	<string name="menu_stroke_width">Width</string>
 	<string name="menu_color">Color</string>
 	
 	<!-- Info, confirmation and error messages. -->

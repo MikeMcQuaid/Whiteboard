@@ -32,21 +32,15 @@ public class WhiteBoardView extends View {
 		points = new LinkedList<Point>();
 	}
 	
-	public void resetState() {
-		//paint.reset();
-		//path.reset();
-
-		// FIXME: Remove these hacks when we can configure
+	public void defaultState() {
 		paint.setAntiAlias(true);
 		paint.setDither(true);
-		paint.setColor(0xFFFF0000);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStrokeCap(Paint.Cap.ROUND);
-		paint.setStrokeWidth(12);
 	}
 
-	public WhiteBoardView(Context context, DataStore ds) {
+	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
 		bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().widthPixels, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
@@ -54,7 +48,9 @@ public class WhiteBoardView extends View {
 		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
 		mDataStore = ds;
 		resetPoints();
-		resetState();
+		defaultState();
+		setPrimColor(color);
+		setPrimStrokeWidth(strokeWidth);
 	}
 
 	@Override
@@ -64,16 +60,21 @@ public class WhiteBoardView extends View {
 
 	private void touchStart(float x, float y) {
 		resetPoints();
-		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		points.add(new Point((int) x, (int) y));
+		mDataStore.add(new Primitive(paint, points));
+
+		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		path.moveTo(x, y);
 		mX = x;
 		mY = y;
 	}
 
 	private void touchMove(float x, float y) {
-		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		points.add(new Point((int) x, (int) y));
+		mDataStore.remove(mDataStore.size() - 1);
+		mDataStore.add(new Primitive(paint, points));
+
+		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
@@ -85,7 +86,6 @@ public class WhiteBoardView extends View {
 
 	private void touchUp() {
 		path.lineTo(mX, mY);
-		mDataStore.add(new Primitive(paint, points));
 		try {
 			System.out.println(mDataStore.getAllPrimitivesAsJSON());
 		} catch (JSONException e) {
@@ -123,5 +123,9 @@ public class WhiteBoardView extends View {
 
 	protected void setPrimColor(int c) {
 		paint.setColor(c);
+	}
+
+	protected void setPrimStrokeWidth(int c) {
+		paint.setStrokeWidth(c);
 	}
 }
