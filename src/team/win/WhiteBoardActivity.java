@@ -5,6 +5,8 @@ package team.win;
 
 import java.util.Random;
 
+import team.win.ColorPickerDialog;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -18,7 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-public class WhiteBoardActivity extends Activity {
+public class WhiteBoardActivity extends Activity implements ColorPickerDialog.OnColorChangedListener {
 	
 	private static final String TAG = "WhiteBoardActivity";
 
@@ -84,11 +86,12 @@ public class WhiteBoardActivity extends Activity {
 			mWhiteBoardView.setPrimStrokeWidth(mLastWidth.mWidth);
 			return true;
 		case R.id.menu_color:
-			mWhiteBoardView.setPrimColor(
+			new ColorPickerDialog(this, this, mWhiteBoardView.getPaint().getColor()).show();
+			/*mWhiteBoardView.setPrimColor(
 				Color.argb(255,
 						   mRandomSource.nextInt(255),
 						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255)));
+						   mRandomSource.nextInt(255)));*/
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -107,4 +110,9 @@ public class WhiteBoardActivity extends Activity {
 			Log.w("teamwin", "Service disconnected");
 		}
 	};
+
+	@Override
+	public void colorChanged(int color) {
+		mWhiteBoardView.setPrimColor(color);
+	}
 }
