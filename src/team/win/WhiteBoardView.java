@@ -124,6 +124,9 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
+		}
 	}
 
 	private void touchUp() {
