@@ -24,7 +24,7 @@ html, body {
 </canvas>
 
 <script>
-var serverTime = 0;
+var serverTimeStamp = 0;
 
 var num = 0;
 var testBoard = function() {
@@ -102,16 +102,13 @@ var paint = function() {
 
 	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
-	if (serverTime)
-		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 	context.restore();
 };
 
 $(document).ready(function() {
-	var fetchTime = function() {
-		$.get('/time', function(time) {
-			$('#time').html(time);
-			serverTime = time;
+	var fetchTimeStamp = function() {
+		$.get('/timestamp', function(time) {
+			serverTimeStamp = time;
 		});
 	};
 	
