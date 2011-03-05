@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -26,11 +27,23 @@ public class WhiteBoardActivity extends Activity {
 	
 	// FIXME: temporary
 	private Random mRandomSource = new Random();
+
+	private enum StrokeWidth {
+		SMALL(5),
+		MEDIUM(10),
+		LARGE(15);
+		int mWidth;
+		StrokeWidth(int width) {
+			mWidth = width;
+		}
+	};
 	
+	private StrokeWidth mLastWidth = StrokeWidth.SMALL;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mWhiteBoardView = new WhiteBoardView(this, mDataStore);
+		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -52,11 +65,30 @@ public class WhiteBoardActivity extends Activity {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
 			return true;
-		case R.id.menu_widget:
+		case R.id.menu_stroke_width:
+			switch(mLastWidth) {
+			case SMALL:
+				mLastWidth = StrokeWidth.MEDIUM;
+				break;
+			case MEDIUM:
+				mLastWidth = StrokeWidth.LARGE;
+				break;
+			case LARGE:
+				mLastWidth = StrokeWidth.SMALL;
+				break;
+			}
+			mWhiteBoardView.setPrimStrokeWidth(mLastWidth.mWidth);
+			return true;
+		case R.id.menu_color:
+			mWhiteBoardView.setPrimColor(
+				Color.argb(mRandomSource.nextInt(255),
+						   mRandomSource.nextInt(255),
+						   mRandomSource.nextInt(255),
+						   mRandomSource.nextInt(255)));
 			return true;
 		default:
 			return super.onContextItemSelected(item);

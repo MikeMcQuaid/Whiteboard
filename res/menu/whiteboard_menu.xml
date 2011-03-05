@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item
-		android:id="@+id/menu_widget"
-		android:icon="@android:drawable/ic_menu_gallery" 
-		android:title="@string/menu_widget"/>
+	<item android:icon="@android:drawable/ic_menu_gallery"
+		android:title="@string/menu_stroke_width"
+		android:id="@+id/menu_stroke_width"/>
 	<item 
 		android:id="@+id/menu_save"
 		android:icon="@android:drawable/ic_menu_save"
 		android:title="@string/menu_save"/>
-	<item
-		android:id="@+id/menu_widget"
-		android:title="@string/menu_widget"
-		android:icon="@android:drawable/ic_menu_gallery"/>
 	<item
 		android:title="@string/menu_color"
 		android:id="@+id/menu_color"
