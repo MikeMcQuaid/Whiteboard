@@ -60,7 +60,8 @@ var resize = function() {
 		newWidth = window.innerHeight / boardAspect;
 	}
 
-	$(canvas).css( { height: newHeight + 'px', width: newWidth + 'px' } );
+	canvas.width = newWidth
+	canvas.height = newHeight
 
 	paint();
 }
