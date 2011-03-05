@@ -28,13 +28,8 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	
 	private static final int STROKE_WIDTH_DIALOG_ID = 1;
 
-	private static final String TAG = "WhiteBoardActivity";
-
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
-	
-	// FIXME: temporary
-	private Random mRandomSource = new Random();
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"),
