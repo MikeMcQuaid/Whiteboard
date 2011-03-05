@@ -124,4 +124,8 @@ public class WhiteBoardView extends View {
 		c.drawBitmap(bitmap, 0, 0, paint);
 		c.drawPath(path, paint);
 	}
+
+	protected void setPrimColor(int c) {
+		paint.setColor(c);
+	}
 }

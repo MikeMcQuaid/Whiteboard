@@ -30,10 +30,8 @@ public class TeamWinActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		setContentView(R.layout.main);		
 		startService(makeServiceIntent());
-		
-		setContentView(R.layout.main);
 		displayRemoteUrl();
 		
 		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);

@@ -94,7 +94,6 @@ $(document).ready(function() {
 			serverTime = time;
 		});
 	};
-	window.setInterval(fetchTime, 1000);
 	
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
@@ -103,6 +102,8 @@ $(document).ready(function() {
 			paint();
 		});
 	};
+	
+	window.setInterval(fetchTime, 1000);
 	window.setInterval(refreshBoard, 1000);
 });
 

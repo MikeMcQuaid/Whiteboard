@@ -3,6 +3,8 @@
  */
 package team.win;
 
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -20,6 +22,9 @@ public class WhiteBoardActivity extends Activity {
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
+	
+	// FIXME: temporary
+	private Random mRandomSource = new Random();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
