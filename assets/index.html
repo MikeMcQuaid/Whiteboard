@@ -51,7 +51,7 @@ var resize = function() {
 	boardAspect = board.width / board.height;
 	windowAspect = window.innerWidth / window.innerHeight;
 
-	if (boardAspect > windowAspect) {
+	if (boardAspect > 1) {
 		newWidth = window.innerWidth;
 		newHeight = window.innerWidth / boardAspect;
 	}
@@ -60,7 +60,8 @@ var resize = function() {
 		newWidth = window.innerHeight / boardAspect;
 	}
 
-	$(canvas).css( { height: newHeight + 'px', width: newWidth + 'px' } );
+	canvas.width = newWidth
+	canvas.height = newHeight
 
 	paint();
 }
