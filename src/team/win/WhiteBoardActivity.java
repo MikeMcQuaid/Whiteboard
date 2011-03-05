@@ -4,9 +4,6 @@
 package team.win;
 
 import java.util.Arrays;
-import java.util.Random;
-
-import team.win.ColorPickerDialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
