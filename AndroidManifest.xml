@@ -3,7 +3,6 @@
 	package="team.win"
 	android:versionCode="1"
 	android:versionName="1.0">
-	
 	<uses-sdk android:targetSdkVersion="7" android:maxSdkVersion="10" android:minSdkVersion="7" />
 
 	<application 
@@ -20,6 +19,8 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		
+		<service android:name="HttpService"></service>
 
 	</application>
 	

@@ -1,12 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<!-- Header: contains the app name, the url to access the whiteboards and quick actions. -->	
+	<RelativeLayout
+		android:id="@+id/header" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content">
+		
+		<LinearLayout 
+			android:id="@+id/header_appinfo"
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:layout_alignParentLeft="true" 
+			android:orientation="vertical">
+			
+			<TextView 
+				android:id="@+id/header_appinfo_name" 
+				android:layout_height="wrap_content" 
+				android:layout_width="wrap_content" 
+				android:text="@string/app_name" />
+				
+			<TextView 
+				android:id="@+id/header_appinfo_remoteurl" 
+				android:layout_height="wrap_content" 
+				android:layout_width="wrap_content" 
+				android:text="Access at: http://192.168.2.3" />
+				
+		</LinearLayout>
+		
+		<LinearLayout 
+			android:id="@+id/header_quickactions"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@id/header_appinfo"
+			android:layout_alignParentRight="true">
+			
+			<Button 
+				android:id="@+id/button_add_whiteboard" 
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:text="Button" />
+		
+		</LinearLayout>
+		
+	</RelativeLayout>
+	
+	<!-- List of saved whiteboards. -->
+	<LinearLayout
+		android:id="@+id/whiteboards"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+	
+	</LinearLayout>
+	
 </LinearLayout>
