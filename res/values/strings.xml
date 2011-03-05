@@ -12,4 +12,5 @@
 	
 	<!-- Info, confirmation and error messages. -->
 	<string name="error_remoteurl">Error getting remote URL</string>
+	<string name="message_nowhiteboards">No saved whiteboards</string>
 </resources>

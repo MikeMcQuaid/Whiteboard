@@ -3,27 +3,28 @@ package team.win;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONException;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.Region;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class WhiteBoardView extends View {
 
+	private final DataStore mDataStore;
+	
 	private Bitmap bitmap;
 	private Canvas canvas;
 	private Paint paint = new Paint();
 	private Path path = new Path();
 	private List<Point> points;
-	private DataStore mDataStore;
+	private HttpService httpService;
 
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;
@@ -51,6 +52,10 @@ public class WhiteBoardView extends View {
 		defaultState();
 		setPrimColor(color);
 		setPrimStrokeWidth(strokeWidth);
+	}
+	
+	public void setHttpService(HttpService httpService) {
+		this.httpService = httpService;
 	}
 
 	@Override
@@ -86,10 +91,9 @@ public class WhiteBoardView extends View {
 
 	private void touchUp() {
 		path.lineTo(mX, mY);
-		try {
-			System.out.println(mDataStore.getAllPrimitivesAsJSON());
-		} catch (JSONException e) {
-			e.printStackTrace();
+		mDataStore.add(new Primitive(paint, points));
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
 		}
 	}
 

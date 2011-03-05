@@ -29,24 +29,28 @@ public class DataStore {
 		return mPrimitiveList.size();
 	}
 
-	public String getAllPrimitivesAsJSON() throws JSONException {
-		JSONArray primitives = new JSONArray();
-		for (Primitive primitive : mPrimitiveList) {
-			JSONArray pointArray = new JSONArray();
-			for (Point point : primitive.mPoints) {
-				pointArray.put(point.x);
-				pointArray.put(point.y);
+	public String getAllPrimitivesAsJSON() {
+		try {
+			JSONArray primitives = new JSONArray();
+			for (Primitive primitive : mPrimitiveList) {
+				JSONArray pointArray = new JSONArray();
+				for (Point point : primitive.mPoints) {
+					pointArray.put(point.x);
+					pointArray.put(point.y);
+				}
+				JSONObject primObject = new JSONObject();
+				primObject.put("color", "" + Integer.toHexString(primitive.mPaint.getColor()));
+				primObject.put("strokeWidth", primitive.mPaint.getStrokeWidth());
+				primObject.put("points", pointArray);
+				primitives.put(primObject);
 			}
-			JSONObject primObject = new JSONObject();
-			primObject.put("color", "" + Integer.toHexString(primitive.mPaint.getColor()));
-			primObject.put("strokeWidth", primitive.mPaint.getStrokeWidth());
-			primObject.put("points", pointArray);
-			primitives.put(primObject);
+			JSONObject o = new JSONObject();
+			o.put("width", 800);
+			o.put("height", 480);
+			o.put("primitives", primitives);
+			return o.toString();
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
 		}
-		JSONObject o = new JSONObject();
-		o.put("width", 800);
-		o.put("height", 480);
-		o.put("primitives", primitives);
-		return o.toString();
 	}
 }
