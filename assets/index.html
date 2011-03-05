@@ -1,21 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html height="100%" width="100%" margin="0" padding="0">
 <head>
 <title>Hello world</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 </head>
-<body>
-<h1>The time sponsored by Android will read: <span id="time"></span></h1>
+<body height="100%" width="100%" margin="0" padding="0">
+<canvas id="canvas"></canvas>
 <script>
+
+var gotTime = 0;
+
+function paint() {
+	var canvas = $('#canvas')[0];
+	var context = canvas.getContext("2d");
+	var windowWidth = window.innerWidth;
+	var windowHeight = window.innerHeight;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	context.strokeRect(0, 0, windowWidth/2, windowHeight/2);
+	var text = "The time sponsored by Android will read: "
+	text += gotTime;
+	context.fillText(text, 50, 50);
+}
+
+$(window).resize(function() {
+	paint();
+});
 
 $(document).ready(function() {
 	var fetchTime = function() {
 		$.get('/time', function(time) {
 			$('#time').html(time);
+			gotTime = time;
 		});
 	};
 	window.setInterval(function () {
 		fetchTime();
+	}, 1000);
+	window.setInterval(function () {
+		paint();
 	}, 1000);
 });
 </script>
