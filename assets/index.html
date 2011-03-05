@@ -75,6 +75,8 @@ var paint = function() {
 	canvas.height = canvas.height;
 
 	var context = canvas.getContext('2d');
+	context.lineCap = 'round';
+	context.lineJoin = 'round';
 	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
