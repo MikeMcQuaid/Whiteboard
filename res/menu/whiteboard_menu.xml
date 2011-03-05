@@ -10,5 +10,9 @@
 	<item
 		android:title="@string/menu_color"
 		android:id="@+id/menu_color"
-		android:icon="@android:drawable/ic_menu_preferences"/>		
+		android:icon="@android:drawable/ic_menu_preferences"/>
+	<item
+		android:title="@string/menu_undo"
+		android:id="@+id/menu_undo"
+		android:icon="@android:drawable/ic_menu_preferences"/>			
 </menu>

@@ -87,11 +87,8 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 			return true;
 		case R.id.menu_color:
 			new ColorPickerDialog(this, this, mWhiteBoardView.getPaint().getColor()).show();
-			/*mWhiteBoardView.setPrimColor(
-				Color.argb(255,
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255)));*/
+			return true;
+		case R.id.menu_undo:
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
