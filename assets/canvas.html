@@ -8,33 +8,41 @@
 <canvas id="canvas" width="800" height="480">
 	Your browser does not support canvas
 </canvas>
+
 <script>
+var num = 0;
 var getBoard = function() {
 	// TODO Get it from the network!
-	return {
-		width: 800,
-		height: 480,
-		paths: [
-			{ strokeColor: '#000000', strokeWidth: 1, path: [0, 0, 100, 100, 200, 0] },
-			{ strokeColor: '#cccccc', strokeWidth: 1, path: [0, 100, 100, 400, 300, 100] },
-		]
+	var paths = []
+	switch (num) {
+	default:
+		paths.push({ strokeColor: '#cccccc', strokeWidth: 1, path: [0, 100, 100, 200, 200, 100] });
+	case 1:
+		paths.push({ strokeColor: '#FF0000', strokeWidth: 1, path: [0, 50, 100, 150, 200, 50] });
+	case 0:
+		paths.push({ strokeColor: '#000000', strokeWidth: 1, path: [0, 0, 100, 100, 200, 0] });
 	}
+	num++;
+	return { width: 800, height: 480, paths: paths };
 };
 
 var redraw = function(canvas) {
 	canvas.width = canvas.width; // clear canvas
 	
-	console.log(board.width + ' ' + board.height);
+	var board = getBoard();
+	console.log('Redrawing: ' + board.width + ' ' + board.height);
 	
 	// TODO bounds checking etc
 	var context = canvas.getContext('2d');
 	$.each(board.paths, function(index, path) {
-		console.log(path);
 		context.beginPath();
-		context.moveTo(0, 0);
 		for (var i = 0; i < (path.path.length / 2); i++) {
 			var point = path.path.slice(i * 2, (i * 2) + 2);
-			context.lineTo(point[0], point[1]);
+			if (i == 0) {
+				context.moveTo(point[0], point[1]); // don't paint on first point
+			} else {
+				context.lineTo(point[0], point[1]);
+			}
 		}
 		context.strokeStyle = path.strokeColor;
 		context.stroke();
@@ -43,7 +51,7 @@ var redraw = function(canvas) {
 
 $(document).ready(function() {
 	var canvas = $('#canvas')[0];
-	window.setInterval(redraw(canvas), 1000);
+	window.setInterval(redraw, 2000, canvas);
 });
 </script>
 </body>
