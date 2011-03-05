@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Color;
 import android.graphics.Point;
 
 public class DataStore {
@@ -39,7 +40,8 @@ public class DataStore {
 					pointArray.put(point.y);
 				}
 				JSONObject primObject = new JSONObject();
-				primObject.put("color", "" + Integer.toHexString(primitive.mPaint.getColor()));
+				// Format color and mask out alpha channel
+				primObject.put("color", Integer.toHexString(primitive.mPaint.getColor() & 0x00FFFFFF));
 				primObject.put("strokeWidth", primitive.mPaint.getStrokeWidth());
 				primObject.put("points", pointArray);
 				primitives.put(primObject);
