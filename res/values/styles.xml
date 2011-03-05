@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="header_appname" parent="@android:style/TextAppearance.Large">
+		
+	</style>
+	<style name="header_remoteurl" parent="@android:style/TextAppearance.Small">
+		
+	</style>
+</resources>

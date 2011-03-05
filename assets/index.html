@@ -12,8 +12,8 @@ html, body {
 }
 
 #canvas {
-	margin-left: auto ;
-	margin-right: auto ;
+	margin-left: auto;
+	margin-right: auto;
 	position: absolute;
 }
 </style>
@@ -25,27 +25,26 @@ html, body {
 
 <script>
 var serverTime = 0;
-var num = 0;
 
-var getBoard = function() {
-	// TODO Get it from the network!
-	var paths = []
-	switch (num) {
-	default:
-		paths.push({ strokeColor: '#cccccc', strokeWidth: 1, path: [0, 100, 100, 200, 200, 100] });
-	case 1:
-		paths.push({ strokeColor: '#FF0000', strokeWidth: 1, path: [0, 50, 100, 150, 200, 50] });
-	case 0:
-		paths.push({ strokeColor: '#000000', strokeWidth: 1, path: [0, 0, 100, 100, 200, 0] });
+var num = 0;
+var testBoard = function() {
+	var primitives = []
+	for (var i = 0; i < num; i++) {
+		var baseY = i * 10;
+		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [i, baseY + 100, 100, i * 2 + 200, 200, i + 100] });
 	}
 	num++;
-	return { width: 480, height: 800, paths: paths };
+	return { width: 800, height: 480, primitives: primitives };
 };
 
+var lastBoard;
+
 var paint = function() {
-	var canvas = $('#canvas')[0];
-	var board = getBoard();
+	var board = lastBoard;
+	console.log('Redrawing: ' + board.width + ' ' + board.height);
+	
 	// Set canvas coordinate system to the same as the device and reset the canvas.
+	var canvas = $('#canvas')[0];
 	canvas.width = board.width;
 	canvas.height = board.height;
 
@@ -66,17 +65,17 @@ var paint = function() {
 	$(canvas).css( { height: newHeight, width: newWidth } );
 
 	var context = canvas.getContext('2d');
-	$.each(board.paths, function(index, path) {
+	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
-		for (var i = 0; i < (path.path.length / 2); i++) {
-			var point = path.path.slice(i * 2, (i * 2) + 2);
+		for (var i = 0; i < (primitive.points.length / 2); i++) {
+			var point = primitive.points.slice(i * 2, (i * 2) + 2);
 			if (i == 0) {
 				context.moveTo(point[0], point[1]); // don't paint on first point.
 			} else {
 				context.lineTo(point[0], point[1]);
 			}
 		}
-		context.strokeStyle = path.strokeColor;
+		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
 	context.strokeRect(0, 0, canvas.width, canvas.height);
@@ -91,16 +90,23 @@ $(document).ready(function() {
 			serverTime = time;
 		});
 	};
+	
+	var canvas = $('#canvas')[0];
+	var refreshBoard = function() {
+		$.get('/board.json', function(board) {
+//			lastBoard = testBoard();
+			lastBoard = board;
+			paint();
+		});
+	};
+	
 	window.setInterval(fetchTime, 1000);
-	window.setInterval(paint, 1000);
+	window.setInterval(refreshBoard, 1000);
 });
 
 $(window).resize(function() {
 	paint();
 });
-
-
-paint();
 </script>
 </body>
 </html>
