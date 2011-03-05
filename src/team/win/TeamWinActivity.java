@@ -1,7 +1,11 @@
+/**
+ * Copyright 2011 TeamWin
+ */
 package team.win;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
 
 import android.app.Activity;
@@ -24,7 +28,7 @@ public class TeamWinActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		startService(makeServiceIntent());
-		logIpAddresses();
+		displayRemoteUrl();
 		
 		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
 		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
@@ -71,18 +75,26 @@ public class TeamWinActivity extends Activity {
 		return intent;
 	}
 	
-	private void logIpAddresses() {
-		// TODO expose this in the UI
+	/**
+	 * Displays the remote URL in the activity to access the whiteboard.
+	 */
+	private void displayRemoteUrl() {
+		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_appinfo_remoteurl);
+		String remoteUrlFormat = getResources().getString(R.string.label_remoteurl);
+		
 		try {
 			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
 				NetworkInterface networkInterface = networkInterfaces.nextElement();
 				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
-					TextView remoteUrl = (TextView) findViewById(R.id.header_appinfo_remoteurl);
-					remoteUrl.setText(inetAddresses.nextElement().toString());
+					InetAddress inetAddress = inetAddresses.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString()));
+					}
 				}
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (SocketException e) {
+			Log.e(TAG, e.getMessage());
+			remoteUrlTextView.setText(getResources().getString(R.string.error_remoteurl));
 		}
 	}
 	
