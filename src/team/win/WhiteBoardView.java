@@ -28,33 +28,32 @@ public class WhiteBoardView extends View {
 
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;
-	
-	public void defaultState() {
+
+	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
+		super(context);
+		int w = getResources().getDisplayMetrics().widthPixels;
+		int h = getResources().getDisplayMetrics().widthPixels;
+		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
+		canvas = new Canvas(bitmap);
+		Log.i("WidthHeight", String.format("%d %d", w, h));
+		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
+		mDataStore = ds;
+		resetPoints();
+		initPaintState();
+		setPrimColor(color);
+		setPrimStrokeWidth(strokeWidth);
+        mDataStore.setWidth(w);
+        mDataStore.setHeight(h);
+	}
+
+	private void initPaintState() {
 		paint.setAntiAlias(true);
 		paint.setDither(true);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 	}
-	
-	/**
-	 * Initialise the WhiteBoard state
-	 * @param context ???
-	 * @param ds datastore object used to communicate with HttpServer
-	 */
-	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
-		super(context);
-		bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().widthPixels, Bitmap.Config.ARGB_8888);
-		canvas = new Canvas(bitmap);
-		Log.i("WidthHeight", String.format("%d %d", getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels));
-		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
-		mDataStore = ds;
-		resetPoints();
-		defaultState();
-		setPrimColor(color);
-		setPrimStrokeWidth(strokeWidth);
-	}
-	
+
 	public void setHttpService(HttpService httpService) {
 		this.httpService = httpService;
 	}
@@ -70,6 +69,8 @@ public class WhiteBoardView extends View {
 		super.onSizeChanged(w, h, oldw, oldh);
 		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
+        mDataStore.setWidth(w);
+        mDataStore.setHeight(h);
 	}
 
 	@Override
@@ -97,7 +98,7 @@ public class WhiteBoardView extends View {
 	private void touchStart(float x, float y) {
 		resetPoints();
 		points.add(new Point((int) x, (int) y));
-		mDataStore.add(new Primitive(paint, points));
+		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
 		
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		points.add(new Point((int) x, (int) y));
@@ -109,8 +110,11 @@ public class WhiteBoardView extends View {
 	private void touchMove(float x, float y) {
 		points.add(new Point((int) x, (int) y));
 		mDataStore.remove(mDataStore.size() - 1);
-		mDataStore.add(new Primitive(paint, points));
-		
+		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
+		}
+
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		points.add(new Point((int) x, (int) y));
 		float dx = Math.abs(x - mX);
@@ -128,24 +132,12 @@ public class WhiteBoardView extends View {
 	private void touchUp() {
 		path.lineTo(mX, mY);
 		canvas.drawPath(path, paint);
-		path.reset();
-		mDataStore.add(new Primitive(paint, points));
 		resetPoints();
+		path.reset();
 	}
-	
+
 	public void resetPoints() {
 		points = new LinkedList<Point>();
-	}
-	
-	public void resetState() {
-		// FIXME: Remove these hacks when we can configure
-		paint.setAntiAlias(true);
-		paint.setDither(true);
-		paint.setColor(0xFFFF0000);
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeJoin(Paint.Join.ROUND);
-		paint.setStrokeCap(Paint.Cap.ROUND);
-		paint.setStrokeWidth(12);
 	}
 
 	protected void setPrimColor(int c) {
