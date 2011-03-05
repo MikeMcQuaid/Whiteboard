@@ -12,8 +12,8 @@ html, body {
 }
 
 #canvas {
-	height: 100%;
-	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
 	position: absolute;
 }
 </style>
@@ -41,31 +41,48 @@ var testBoard = function() {
 	return { width: 800, height: 480, primitives: primitives };
 };
 
-var paint = function(board, canvas) {
-	canvas.width = window.innerWidth; // Clear and resize canvas
-	canvas.height = window.innerHeight;
+var lastBoard;
 
+var paint = function() {
+	var board = lastBoard;
 	console.log('Redrawing: ' + board.width + ' ' + board.height);
+	
+	// Set canvas coordinate system to the same as the device and reset the canvas.
+	var canvas = $('#canvas')[0];
+	canvas.width = board.width;
+	canvas.height = board.height;
 
-	// TODO bounds checking etc
+	// Use CSS to scale the canvas to the window.
+	if (board.width > board.height) {
+		newWidth = '100%';
+		var widthScaleFactor = board.width / window.innerWidth;
+		newHeight = board.width / widthScaleFactor
+		newHeight + 'px';
+	}
+	else {
+		newHeight = '100%';
+		var heightScaleFactor = board.height / window.innerHeight;
+		newWidth = board.height / heightScaleFactor
+		newHeight + 'px';
+	}
+
+	$(canvas).css( { height: newHeight, width: newWidth } );
+
 	var context = canvas.getContext('2d');
-	var windowWidth = window.innerWidth;
-	var windowHeight = window.innerHeight;
 	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
 			var point = primitive.points.slice(i * 2, (i * 2) + 2);
 			if (i == 0) {
-				context.moveTo(point[0], point[1]); // don't paint on first point
+				context.moveTo(point[0], point[1]); // don't paint on first point.
 			} else {
 				context.lineTo(point[0], point[1]);
 			}
 		}
-//		context.strokeStyle = path.color;
-		context.strokeStyle = '#CCCCCC';
+		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
-	context.strokeRect(0, 0, windowWidth/2, windowHeight/2);
+	context.strokeRect(0, 0, canvas.width, canvas.height);
 	if (serverTime)
 		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 };
@@ -82,7 +99,8 @@ $(document).ready(function() {
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
 		$.get('/board.json', function(board) {
-			paint(board, canvas);
+			lastBoard = board;
+			paint();
 		});
 	};
 	window.setInterval(refreshBoard, 1000);

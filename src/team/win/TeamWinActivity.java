@@ -1,10 +1,12 @@
+/**
+ * Copyright 2011 TeamWin
+ */
 package team.win;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
-
-import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -16,25 +18,31 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class TeamWinActivity extends Activity {
 	
 	private static final String TAG = "TeamWinActivity";
 
-	private HttpService httpService;
-	private WhiteBoardView whiteBoardView;
-	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		logIpAddresses();
 		
-		whiteBoardView = new WhiteBoardView(this, new DataStore());
-		setContentView(whiteBoardView);
+		startService(makeServiceIntent());
 		
-		startService(makeServiceIntent()); // so that it doesn't die
-		bindService(makeServiceIntent(), serviceConnection, 0);
+		setContentView(R.layout.main);
+		displayRemoteUrl();
+		
+		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
+		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
+			}
+		});
 	}
 
 	@Override
@@ -73,31 +81,27 @@ public class TeamWinActivity extends Activity {
 		return intent;
 	}
 	
-	private void logIpAddresses() {
-		// TODO expose this in the UI
+	/**
+	 * Displays the remote URL in the activity to access the whiteboard.
+	 */
+	private void displayRemoteUrl() {
+		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_appinfo_remoteurl);
+		String remoteUrlFormat = getResources().getString(R.string.label_remoteurl);
+		
 		try {
 			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
 				NetworkInterface networkInterface = networkInterfaces.nextElement();
 				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
-					Log.e("teamwin", inetAddresses.nextElement().toString());
+					InetAddress inetAddress = inetAddresses.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString()));
+					}
 				}
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (SocketException e) {
+			Log.e(TAG, e.getMessage());
+			remoteUrlTextView.setText(getResources().getString(R.string.error_remoteurl));
 		}
 	}
 	
-	
-	private ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.w("teamwin", "Service connected");
-			whiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
-		}
-		
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			Log.w("teamwin", "Service disconnected");
-		}
-	};
 }
