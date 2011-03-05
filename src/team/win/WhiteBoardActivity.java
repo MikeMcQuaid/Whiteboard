@@ -45,7 +45,7 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_widget:
 			return true;
 		case R.id.menu_color:
-			mWhiteBoardView.setPrimColor(Color.argb(mRandomSource.nextInt(255), mRandomSource.nextInt(255), mRandomSource.nextInt(255), mRandomSource.nextInt(255)));
+			mWhiteBoardView.setPrimColor(Color.argb(255, mRandomSource.nextInt(255), mRandomSource.nextInt(255), mRandomSource.nextInt(255)));
 			return true;
 		default:
 			return super.onContextItemSelected(item);
