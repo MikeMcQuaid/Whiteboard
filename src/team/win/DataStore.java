@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.Color;
 import android.graphics.Point;
 
 public class DataStore {
@@ -57,7 +56,7 @@ public class DataStore {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public void setWidth(int width) {
 		mWidth = width;
 	}

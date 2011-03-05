@@ -19,8 +19,6 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 
 public class WhiteBoardActivity extends Activity {
-	
-	private static final String TAG = "WhiteBoardActivity";
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
