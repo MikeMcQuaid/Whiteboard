@@ -85,6 +85,9 @@ var paint = function() {
 	context.lineJoin = 'round';
 	context.scale(scaleFactor, scaleFactor);
 	$.each(board.primitives, function(index, primitive) {
+		if (!primitive.points)
+			break;
+
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
 			var point = primitive.points.slice(i * 2, (i * 2) + 2);
