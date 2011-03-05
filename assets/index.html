@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html height="100%" width="100%" margin="0" padding="0">
+<html>
 <head>
 <title>Hello canvas</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<style>
+html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#canvas {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
+</style>
 </head>
-<body height="100%" width="100%" margin="0" padding="0">
-<canvas id="canvas" width="800" height="480">
+<body>
+<canvas id="canvas">
 	Your browser does not support HTML5 canvas
 </canvas>
 
