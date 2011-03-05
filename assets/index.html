@@ -26,43 +26,43 @@ html, body {
 <script>
 var serverTime = 0;
 var num = 0;
-var getBoard = function() {
+var testBoard = function() {
 	// TODO Get it from the network!
-	var paths = []
+	var primitives = []
 	switch (num) {
 	default:
-		paths.push({ strokeColor: '#cccccc', strokeWidth: 1, path: [0, 100, 100, 200, 200, 100] });
+		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [0, 100, 100, 200, 200, 100] });
 	case 1:
-		paths.push({ strokeColor: '#FF0000', strokeWidth: 1, path: [0, 50, 100, 150, 200, 50] });
+		primitives.push({ color: '#FF0000', strokeWidth: 1, points: [0, 50, 100, 150, 200, 50] });
 	case 0:
-		paths.push({ strokeColor: '#000000', strokeWidth: 1, path: [0, 0, 100, 100, 200, 0] });
+		primitives.push({ color: '#000000', strokeWidth: 1, points: [0, 0, 100, 100, 200, 0] });
 	}
 	num++;
-	return { width: 800, height: 480, paths: paths };
+	return { width: 800, height: 480, primitives: primitives };
 };
 
-var paint = function(canvas) {
+var paint = function(board, canvas) {
 	canvas.width = window.innerWidth; // Clear and resize canvas
 	canvas.height = window.innerHeight;
 
-	var board = getBoard();
 	console.log('Redrawing: ' + board.width + ' ' + board.height);
 
 	// TODO bounds checking etc
 	var context = canvas.getContext('2d');
 	var windowWidth = window.innerWidth;
 	var windowHeight = window.innerHeight;
-	$.each(board.paths, function(index, path) {
+	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
-		for (var i = 0; i < (path.path.length / 2); i++) {
-			var point = path.path.slice(i * 2, (i * 2) + 2);
+		for (var i = 0; i < (primitive.points.length / 2); i++) {
+			var point = primitive.points.slice(i * 2, (i * 2) + 2);
 			if (i == 0) {
 				context.moveTo(point[0], point[1]); // don't paint on first point
 			} else {
 				context.lineTo(point[0], point[1]);
 			}
 		}
-		context.strokeStyle = path.strokeColor;
+//		context.strokeStyle = path.color;
+		context.strokeStyle = '#CCCCCC';
 		context.stroke();
 	});
 	context.strokeRect(0, 0, windowWidth/2, windowHeight/2);
@@ -78,8 +78,14 @@ $(document).ready(function() {
 		});
 	};
 	window.setInterval(fetchTime, 1000);
+	
 	var canvas = $('#canvas')[0];
-	window.setInterval(paint, 1000, canvas);
+	var refreshBoard = function() {
+		$.get('/board.json', function(board) {
+			paint(board, canvas);
+		});
+	};
+	window.setInterval(refreshBoard, 1000);
 });
 
 $(window).resize(function() {

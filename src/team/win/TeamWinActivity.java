@@ -7,8 +7,11 @@ import java.util.Enumeration;
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,15 +21,20 @@ public class TeamWinActivity extends Activity {
 	
 	private static final String TAG = "TeamWinActivity";
 
-	private DataStore mDataStore = new DataStore();
-
+	private HttpService httpService;
+	private WhiteBoardView whiteBoardView;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(new WhiteBoardView(this, mDataStore));
-		startService(makeServiceIntent());
 		logIpAddresses();
+		
+		whiteBoardView = new WhiteBoardView(this, new DataStore());
+		setContentView(whiteBoardView);
+		
+		startService(makeServiceIntent()); // so that it doesn't die
+		bindService(makeServiceIntent(), serviceConnection, 0);
 	}
 
 	@Override
@@ -79,4 +87,17 @@ public class TeamWinActivity extends Activity {
 		}
 	}
 	
+	
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			Log.w("teamwin", "Service connected");
+			whiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
+		}
+		
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			Log.w("teamwin", "Service disconnected");
+		}
+	};
 }
