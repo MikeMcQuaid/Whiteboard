@@ -15,13 +15,28 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 public class HttpService extends Service {
 	
+	public static final int PORT_NUMBER = 8080;
+
+	public class HttpServiceBinder extends Binder {
+		public HttpService getService() {
+			return HttpService.this;
+		}
+	};
+	
 	private final IBinder binder = new HttpServiceBinder();
+	private final Server server;
 	
 	private DataStore dataStore;
-	private Server server;
+
+	public HttpService() {
+		server = new Server(PORT_NUMBER);
+		server.setHandler(new Handler());
+	}
 	
 	public void setDataStore(DataStore dataStore) {
 		this.dataStore = dataStore;
@@ -33,29 +48,30 @@ public class HttpService extends Service {
 	}
 	
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public synchronized int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		
-		server = new Server(8080);
-		server.setHandler(new Handler());
-		
-		try {
-			server.start();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		if (!server.isRunning()) {
+			try {
+				server.start();
+			} catch (Exception e) {
+				Log.w("Teamwin", "Unable to start server", e);
+				Toast.makeText(getApplicationContext(), "Unable to start server: " + e.getMessage(), 3).show();
+			}
 		}
 		
 		return START_STICKY;
 	}
 	
 	@Override
-	public void onDestroy() {
+	public synchronized void onDestroy() {
 		super.onDestroy();
 		
 		try {
 			server.stop();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Log.w("Teamwin", "Unable to stop server", e);
+			Toast.makeText(getApplicationContext(), "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
 	
@@ -107,9 +123,4 @@ public class HttpService extends Service {
 		}
 	}
 	
-	public class HttpServiceBinder extends Binder {
-		public HttpService getService() {
-			return HttpService.this;
-		}
-	};
 }

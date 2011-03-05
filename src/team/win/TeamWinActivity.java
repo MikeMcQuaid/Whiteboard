@@ -9,11 +9,8 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 import android.app.ListActivity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +32,7 @@ public class TeamWinActivity extends ListActivity {
 		startService(makeServiceIntent());
 		displayRemoteUrl();
 		
-		setListAdapter(new ArrayAdapter(this, R.layout.main, new String[] {}));
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.main, new String[] {}));
 		
 		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
 		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +92,7 @@ public class TeamWinActivity extends ListActivity {
 				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
 					InetAddress inetAddress = inetAddresses.nextElement();
 					if (!inetAddress.isLoopbackAddress()) {
-						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString()));
+						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString(), HttpService.PORT_NUMBER));
 					}
 				}
 			}

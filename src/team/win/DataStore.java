@@ -7,11 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.Color;
 import android.graphics.Point;
 
 public class DataStore {
 	private List<Primitive> mPrimitiveList;
+	private int mWidth;
+	private int mHeight;
 
 	public DataStore() {
 		super();
@@ -41,18 +42,26 @@ public class DataStore {
 				}
 				JSONObject primObject = new JSONObject();
 				// Format color and mask out alpha channel
-				primObject.put("color", Integer.toHexString(primitive.mPaint.getColor() & 0x00FFFFFF));
-				primObject.put("strokeWidth", primitive.mPaint.getStrokeWidth());
+				primObject.put("color", Integer.toHexString(primitive.mColor));
+				primObject.put("strokeWidth", primitive.mStrokeWidth);
 				primObject.put("points", pointArray);
 				primitives.put(primObject);
 			}
 			JSONObject o = new JSONObject();
-			o.put("width", 800);
-			o.put("height", 480);
+			o.put("width", mWidth);
+			o.put("height", mHeight);
 			o.put("primitives", primitives);
 			return o.toString();
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void setWidth(int width) {
+		mWidth = width;
+	}
+	
+	public void setHeight(int height) {
+		mHeight = height;
 	}
 }

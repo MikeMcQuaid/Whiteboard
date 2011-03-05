@@ -38,7 +38,9 @@ var testBoard = function() {
 };
 
 var lastBoard;
+var scaleFactor = 0;
 
+// TODO: Stop resize from running constantly.
 var resize = function() {
 	var board = lastBoard;
 
@@ -51,7 +53,7 @@ var resize = function() {
 	boardAspect = board.width / board.height;
 	windowAspect = window.innerWidth / window.innerHeight;
 
-	if (boardAspect > windowAspect) {
+	if (boardAspect > 1) {
 		newWidth = window.innerWidth;
 		newHeight = window.innerWidth / boardAspect;
 	}
@@ -60,12 +62,15 @@ var resize = function() {
 		newWidth = window.innerHeight / boardAspect;
 	}
 
-	$(canvas).css( { height: newHeight + 'px', width: newWidth + 'px' } );
-
-	paint();
+	canvas.width = newWidth
+	canvas.height = newHeight
+	scaleFactor = canvas.width/board.width;
 }
 
 var paint = function() {
+	if (scaleFactor == 0)
+		resize();
+
 	var board = lastBoard;
 
 	// Reset the canvas.
@@ -74,6 +79,11 @@ var paint = function() {
 	canvas.height = canvas.height;
 
 	var context = canvas.getContext('2d');
+	context.save();
+
+	context.lineCap = 'round';
+	context.lineJoin = 'round';
+	context.scale(scaleFactor, scaleFactor);
 	$.each(board.primitives, function(index, primitive) {
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
@@ -88,9 +98,13 @@ var paint = function() {
 		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
+	context.restore();
+
+	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 	if (serverTime)
 		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
+	context.restore();
 };
 
 $(document).ready(function() {
@@ -106,17 +120,18 @@ $(document).ready(function() {
 		$.get('/board.json', function(board) {
 //			lastBoard = testBoard();
 			lastBoard = board;
-			resize();
 			paint();
 		});
 	};
 	
 	window.setInterval(fetchTime, 1000);
 	window.setInterval(refreshBoard, 500);
+	paint();
 });
 
 $(window).resize(function() {
-	resize();
+	scaleFactor = 0;
+	paint();
 });
 </script>
 </body>
