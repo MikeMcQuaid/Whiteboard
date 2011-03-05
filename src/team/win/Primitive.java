@@ -1,13 +1,14 @@
 package team.win;
 
+import java.io.Serializable;
 import java.util.List;
 
-import android.graphics.Point;
+public class Primitive implements Serializable {
+	private static final long serialVersionUID = 5479603618265015319L;
 
-public class Primitive {
+	List <Point> mPoints;
 	int mStrokeWidth;
 	int mColor;
-	List<Point> mPoints;
 	public Primitive(int strokeWidth, int color, List<Point> points) {
 		mStrokeWidth = strokeWidth;
 		mColor = color & 0x00FFFFFF;

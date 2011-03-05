@@ -1,16 +1,18 @@
 package team.win;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.Point;
-
 public class DataStore {
-	private List<Primitive> mPrimitiveList;
+	private LinkedList<Primitive> mPrimitiveList;
 	private int mWidth;
 	private int mHeight;
 
@@ -31,17 +33,24 @@ public class DataStore {
 		return mPrimitiveList.size();
 	}
 
+	public void setWidth(int width) {
+		mWidth = width;
+	}
+
+	public void setHeight(int height) {
+		mHeight = height;
+	}
+
 	public String getAllPrimitivesAsJSON() {
 		try {
 			JSONArray primitives = new JSONArray();
 			for (Primitive primitive : mPrimitiveList) {
 				JSONArray pointArray = new JSONArray();
 				for (Point point : primitive.mPoints) {
-					pointArray.put(point.x);
-					pointArray.put(point.y);
+					pointArray.put(point.mX);
+					pointArray.put(point.mY);
 				}
 				JSONObject primObject = new JSONObject();
-				// Format color and mask out alpha channel
 				primObject.put("color", Integer.toHexString(primitive.mColor));
 				primObject.put("strokeWidth", primitive.mStrokeWidth);
 				primObject.put("points", pointArray);
@@ -57,11 +66,19 @@ public class DataStore {
 		}
 	}
 
-	public void setWidth(int width) {
-		mWidth = width;
+	public void serializeDataStore(OutputStream outputStream) throws IOException {
+		new ObjectOutputStream(outputStream).writeObject(mPrimitiveList);
 	}
-	
-	public void setHeight(int height) {
-		mHeight = height;
+
+	@SuppressWarnings("unchecked")
+	public void deserializeDataStore(InputStream inputStream) throws IOException {
+		try {
+			mPrimitiveList = (LinkedList<Primitive>)new ObjectInputStream(inputStream).readObject();
+			System.out.println("Loaded prims");
+			for (Primitive p : mPrimitiveList)
+				System.out.println(p.toString());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }
