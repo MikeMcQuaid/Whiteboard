@@ -96,7 +96,7 @@ public class WhiteBoardView extends View {
 	private void touchStart(float x, float y) {
 		resetPoints();
 		points.add(new Point(x / mWidth, y / mHeight));
-		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
+		mDataStore.add(new Primitive(paint.getStrokeWidth() / mWidth, paint.getColor(), points));
 		
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
 		path.moveTo(x, y);
@@ -107,7 +107,7 @@ public class WhiteBoardView extends View {
 	private void touchMove(float x, float y) {
 		points.add(new Point(x / mWidth, y / mHeight));
 		mDataStore.remove(mDataStore.size() - 1);
-		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
+		mDataStore.add(new Primitive(paint.getStrokeWidth() / mWidth, paint.getColor(), points));
 		if (httpService != null) {
 			httpService.setDataStore(mDataStore);
 		}
