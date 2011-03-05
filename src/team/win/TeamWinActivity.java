@@ -10,8 +10,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 public class TeamWinActivity extends Activity {
+	
+	private static final String TAG = "TeamWinActivity";
+
 	private DataStore mDataStore = new DataStore();
 
 	/** Called when the activity is first created. */
@@ -20,12 +26,35 @@ public class TeamWinActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(new WhiteBoardView(this, mDataStore));
 		try {
-			Log.i("hihi", mDataStore.getAllPrimitivesAsJSON());
+			Log.i(TAG, mDataStore.getAllPrimitivesAsJSON());
 		} catch (JSONException e) {
-			throw new RuntimeException(e);
+			Log.e("EAJSNOOB", "ajs would have crashed the application here");
+			//throw new RuntimeException(e);
 		}
 		startService(makeServiceIntent());
 		logIpAddresses();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.main_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_shutdown:
+			// TODO We need to properly shutdown the HTTP server.
+			// We want to allow the user to switch to other applications
+			// whilst the whiteboard is running and still give the user the ability to
+			// explicitly shutdown the application and stop the web server.
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
@@ -55,4 +84,5 @@ public class TeamWinActivity extends Activity {
 			throw new RuntimeException(e);
 		}
 	}
+	
 }
