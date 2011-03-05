@@ -24,7 +24,7 @@ html, body {
 </canvas>
 
 <script>
-var serverTime = 0;
+var serverTimeStamp = 0;
 
 var num = 0;
 var testBoard = function() {
@@ -85,6 +85,9 @@ var paint = function() {
 	context.lineJoin = 'round';
 	context.scale(scaleFactor, scaleFactor);
 	$.each(board.primitives, function(index, primitive) {
+		if (!primitive.points)
+			return false;
+
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
 			var point = primitive.points.slice(i * 2, (i * 2) + 2);
@@ -102,16 +105,13 @@ var paint = function() {
 
 	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
-	if (serverTime)
-		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 	context.restore();
 };
 
 $(document).ready(function() {
-	var fetchTime = function() {
-		$.get('/time', function(time) {
-			$('#time').html(time);
-			serverTime = time;
+	var fetchTimeStamp = function() {
+		$.get('/timestamp', function(time) {
+			serverTimeStamp = time;
 		});
 	};
 	
@@ -124,7 +124,7 @@ $(document).ready(function() {
 		});
 	};
 	
-	window.setInterval(fetchTime, 1000);
+	//window.setInterval(fetchTimeStamp, 1000);
 	window.setInterval(refreshBoard, 500);
 	paint();
 });

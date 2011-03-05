@@ -92,7 +92,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
-		intent.setClass(getApplicationContext(), HttpService.class);
+		intent.setClass(this, HttpService.class);
 		return intent;
 	}
 	
