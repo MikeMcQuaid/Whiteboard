@@ -8,7 +8,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,10 +16,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class TeamWinActivity extends Activity {
+public class TeamWinActivity extends ListActivity {
 	
 	private static final String TAG = "TeamWinActivity";
 
@@ -30,6 +31,8 @@ public class TeamWinActivity extends Activity {
 		setContentView(R.layout.main);
 		startService(makeServiceIntent());
 		displayRemoteUrl();
+		
+		setListAdapter(new ArrayAdapter(this, R.layout.main, new String[] {}));
 		
 		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
 		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +83,7 @@ public class TeamWinActivity extends Activity {
 	 * Displays the remote URL in the activity to access the whiteboard.
 	 */
 	private void displayRemoteUrl() {
-		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_appinfo_remoteurl);
+		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
 		String remoteUrlFormat = getResources().getString(R.string.label_remoteurl);
 		
 		try {
