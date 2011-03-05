@@ -75,7 +75,7 @@ public class TeamWinActivity extends ListActivity {
 
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
-		intent.setClass(getApplicationContext(), HttpService.class);
+		intent.setClass(this, HttpService.class);
 		return intent;
 	}
 	
@@ -92,7 +92,7 @@ public class TeamWinActivity extends ListActivity {
 				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
 					InetAddress inetAddress = inetAddresses.nextElement();
 					if (!inetAddress.isLoopbackAddress()) {
-						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString()));
+						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString(), HttpService.PORT_NUMBER));
 					}
 				}
 			}

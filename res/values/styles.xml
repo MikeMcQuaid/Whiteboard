@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<style name="header">
+		<item name="android:background">@drawable/shape_background_header</item>
+		<item name="android:padding">5dp</item>
+	</style>
 	<style name="header_appname" parent="@android:style/TextAppearance.Large">
 		
 	</style>
 	<style name="header_remoteurl" parent="@android:style/TextAppearance.Small">
-		
+		<item name="android:textSize">12sp</item>
 	</style>
 </resources>

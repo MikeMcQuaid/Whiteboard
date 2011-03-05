@@ -24,7 +24,7 @@ html, body {
 </canvas>
 
 <script>
-var serverTime = 0;
+var serverTimeStamp = 0;
 
 var num = 0;
 var testBoard = function() {
@@ -38,7 +38,9 @@ var testBoard = function() {
 };
 
 var lastBoard;
+var scaleFactor = 0;
 
+// TODO: Stop resize from running constantly.
 var resize = function() {
 	var board = lastBoard;
 
@@ -62,11 +64,13 @@ var resize = function() {
 
 	canvas.width = newWidth
 	canvas.height = newHeight
-
-	paint();
+	scaleFactor = canvas.width/board.width;
 }
 
 var paint = function() {
+	if (scaleFactor == 0)
+		resize();
+
 	var board = lastBoard;
 
 	// Reset the canvas.
@@ -79,7 +83,11 @@ var paint = function() {
 
 	context.lineCap = 'round';
 	context.lineJoin = 'round';
+	context.scale(scaleFactor, scaleFactor);
 	$.each(board.primitives, function(index, primitive) {
+		if (!primitive.points)
+			break;
+
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
 			var point = primitive.points.slice(i * 2, (i * 2) + 2);
@@ -96,19 +104,14 @@ var paint = function() {
 	context.restore();
 
 	context.save();
-	context.lineWidth = 1;
-	context.strokeStyle = '#000000';
 	context.strokeRect(0, 0, canvas.width, canvas.height);
-	if (serverTime)
-		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 	context.restore();
 };
 
 $(document).ready(function() {
-	var fetchTime = function() {
-		$.get('/time', function(time) {
-			$('#time').html(time);
-			serverTime = time;
+	var fetchTimeStamp = function() {
+		$.get('/timestamp', function(time) {
+			serverTimeStamp = time;
 		});
 	};
 	
@@ -117,17 +120,18 @@ $(document).ready(function() {
 		$.get('/board.json', function(board) {
 //			lastBoard = testBoard();
 			lastBoard = board;
-			resize();
 			paint();
 		});
 	};
 	
-	window.setInterval(fetchTime, 1000);
+	//window.setInterval(fetchTimeStamp, 1000);
 	window.setInterval(refreshBoard, 500);
+	paint();
 });
 
 $(window).resize(function() {
-	resize();
+	scaleFactor = 0;
+	paint();
 });
 </script>
 </body>

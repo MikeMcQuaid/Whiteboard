@@ -136,8 +136,13 @@ public class WhiteBoardView extends View {
 	public void resetPoints() {
 		points = new LinkedList<Point>();
 	}
+	
+	public Paint getPaint()
+	{
+		return this.paint;
+	}
 
-	protected void setPrimColor(int c) {
+	public void setPrimColor(int c) {
 		paint.setColor(c);
 	}
 
