@@ -6,5 +6,6 @@
 		android:title="@string/menu_save"/>
 	<item
 		android:id="@+id/menu_widget"
-		android:title="@string/menu_widget" android:icon="@android:drawable/ic_menu_gallery"/>		
+		android:title="@string/menu_widget" android:icon="@android:drawable/ic_menu_gallery"/><item
+		android:title="@string/menu_color" android:id="@+id/menu_color" android:icon="@android:drawable/ic_menu_preferences"/>		
 </menu>

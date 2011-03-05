@@ -7,4 +7,5 @@
 	<string name="menu_shutdown">Shutdown</string>
 	<string name="menu_save">Save</string>
 	<string name="menu_widget">Widget</string>
+	<string name="menu_color">Color</string>
 </resources>

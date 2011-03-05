@@ -3,7 +3,10 @@
  */
 package team.win;
 
+import java.util.Random;
+
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +18,9 @@ public class WhiteBoardActivity extends Activity {
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
+	
+	// FIXME: temporary
+	private Random mRandomSource = new Random();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +37,15 @@ public class WhiteBoardActivity extends Activity {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
+		System.out.println("got here" + item);
 		switch (item.getItemId()) {
 		case R.id.menu_save:
 			return true;
 		case R.id.menu_widget:
+			return true;
+		case R.id.menu_color:
+			mWhiteBoardView.setPrimColor(Color.argb(mRandomSource.nextInt(255), mRandomSource.nextInt(255), mRandomSource.nextInt(255), mRandomSource.nextInt(255)));
 			return true;
 		default:
 			return super.onContextItemSelected(item);

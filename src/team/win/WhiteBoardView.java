@@ -8,11 +8,10 @@ import org.json.JSONException;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.Region;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -120,5 +119,9 @@ public class WhiteBoardView extends View {
 		c.drawColor(0xFFAAAAAA);
 		c.drawBitmap(bitmap, 0, 0, paint);
 		c.drawPath(path, paint);
+	}
+
+	protected void setPrimColor(int c) {
+		paint.setColor(c);
 	}
 }
