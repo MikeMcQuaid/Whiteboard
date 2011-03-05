@@ -4,6 +4,10 @@
 	<string name="app_name">TeamWin</string>
 	
 	<!-- Labels for menu items, buttons etc. -->
+	<string name="label_remoteurl">Access at: http:/%1$s</string>
 	<string name="menu_shutdown">Shutdown</string>
 	<string name="menu_save">Save</string>
+	
+	<!-- Info, confirmation and error messages. -->
+	<string name="error_remoteurl">Error getting remote URL</string>
 </resources>
