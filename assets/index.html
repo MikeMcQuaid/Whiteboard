@@ -86,7 +86,7 @@ var paint = function() {
 	context.scale(scaleFactor, scaleFactor);
 	$.each(board.primitives, function(index, primitive) {
 		if (!primitive.points)
-			break;
+			return false;
 
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
