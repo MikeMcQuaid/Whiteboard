@@ -4,13 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class WhiteBoardView extends View {
-	public WhiteBoardView(Context context) {
+	private DataStore mDataStore;
+
+	public WhiteBoardView(Context context, DataStore ds) {
 		super(context);
+		mDataStore = ds;
 	}
 
 	public boolean onTouchEvent(MotionEvent e) {

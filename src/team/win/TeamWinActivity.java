@@ -4,17 +4,26 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 public class TeamWinActivity extends Activity {
+	private DataStore mDataStore = new DataStore();
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(new WhiteBoardView(this));
+		setContentView(new WhiteBoardView(this, mDataStore));
+		try {
+			Log.i("hihi", mDataStore.getAllPrimitivesAsJSON());
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
 		startService(makeServiceIntent());
 		logIpAddresses();
 	}
