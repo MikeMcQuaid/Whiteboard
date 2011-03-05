@@ -5,4 +5,5 @@
 	
 	<!-- Labels for menu items, buttons etc. -->
 	<string name="menu_shutdown">Shutdown</string>
+	<string name="menu_save">Save</string>
 </resources>
