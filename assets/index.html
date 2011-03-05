@@ -39,9 +39,9 @@ var testBoard = function() {
 
 var lastBoard;
 
-var paint = function() {
+var resize = function() {
 	var board = lastBoard;
-	
+
 	// Set canvas coordinate system to the same as the device and reset the canvas.
 	var canvas = $('#canvas')[0];
 	canvas.width = board.width;
@@ -61,6 +61,17 @@ var paint = function() {
 	}
 
 	$(canvas).css( { height: newHeight + 'px', width: newWidth + 'px' } );
+
+	paint();
+}
+
+var paint = function() {
+	var board = lastBoard;
+
+	// Reset the canvas.
+	var canvas = $('#canvas')[0];
+	canvas.width = canvas.width;
+	canvas.height = canvas.height;
 
 	var context = canvas.getContext('2d');
 	$.each(board.primitives, function(index, primitive) {
@@ -94,6 +105,7 @@ $(document).ready(function() {
 		$.get('/board.json', function(board) {
 //			lastBoard = testBoard();
 			lastBoard = board;
+			resize();
 			paint();
 		});
 	};
@@ -103,7 +115,7 @@ $(document).ready(function() {
 });
 
 $(window).resize(function() {
-	paint();
+	resize();
 });
 </script>
 </body>
