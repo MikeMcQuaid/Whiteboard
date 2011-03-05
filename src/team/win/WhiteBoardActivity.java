@@ -91,7 +91,7 @@ public class WhiteBoardActivity extends Activity {
 						   mRandomSource.nextInt(255)));
 			return true;
 		default:
-			return super.onContextItemSelected(item);
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
