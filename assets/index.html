@@ -108,6 +108,8 @@ var paint = function() {
 	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 	context.restore();
+
+	$('#download').attr('href', canvas.toDataURL('image/png'));
 };
 
 $(document).ready(function() {
