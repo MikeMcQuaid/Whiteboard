@@ -13,8 +13,7 @@
 		<activity 
 			android:name=".TeamWinActivity"
 			android:label="@string/app_name"
-			android:theme="@android:style/Theme.NoTitleBar"
-			android:screenOrientation="landscape">
+			android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -23,7 +22,8 @@
 		
 		<activity 
 			android:name=".WhiteBoardActivity"
-			android:theme="@android:style/Theme.NoTitleBar">
+			android:theme="@android:style/Theme.NoTitleBar"
+			android:screenOrientation="landscape">
 		</activity>
 		
 		<service android:name="HttpService"></service>

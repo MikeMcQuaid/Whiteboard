@@ -120,6 +120,9 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
+		}
 	}
 
 	private void touchUp() {
@@ -128,9 +131,6 @@ public class WhiteBoardView extends View {
 		path.reset();
 		mDataStore.add(new Primitive(paint, points));
 		resetPoints();
-		if (httpService != null) {
-			httpService.setDataStore(mDataStore);
-		}
 	}
 	
 	public void resetPoints() {
