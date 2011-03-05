@@ -1,42 +1,44 @@
 package team.win;
 
 import java.util.LinkedList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONStringer;
+import org.json.JSONObject;
 
-import android.graphics.Paint;
+import android.graphics.Point;
 
 public class DataStore {
-	private LinkedList<Paint> mPrimitiveList;
+	private List<Primitive> mPrimitiveList;
 
 	public DataStore() {
 		super();
+		mPrimitiveList = new LinkedList<Primitive>();
 	}
 
-	public boolean add(Paint p) {
+	public boolean add(Primitive p) {
 		return mPrimitiveList.add(p);
 	}
 
 	public String getAllPrimitivesAsJSON() throws JSONException {
-		JSONStringer s = new JSONStringer();
-		s.object();
-		s.key("width");
-		s.value(800);
-		s.key("height");
-		s.value(480);
-		s.array();
-		for (Paint p : mPrimitiveList) {
-			s.key("color");
-			s.value(p.getColor());
-			s.key("strokeWidth");
-			s.value(p.getStrokeWidth());
-			s.array();
-			// FIXME: ADD PATH
-			s.endArray();
+		JSONArray primitives = new JSONArray();
+		for (Primitive primitive : mPrimitiveList) {
+			JSONArray pointArray = new JSONArray();
+			for (Point point : primitive.mPoints) {
+				pointArray.put(point.x);
+				pointArray.put(point.y);
+			}
+			JSONObject primObject = new JSONObject();
+			primObject.put("color", primitive.mPaint.getColor());
+			primObject.put("strokeWidth", primitive.mPaint.getStrokeWidth());
+			primObject.put("points", pointArray);
+			primitives.put(primObject);
 		}
-		s.endArray();
-		s.endObject();
-		return s.toString();
+		JSONObject o = new JSONObject();
+		o.put("width", 800);
+		o.put("height", 480);
+		o.put("primitives", primitives);
+		return o.toString();
 	}
 }

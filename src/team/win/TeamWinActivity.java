@@ -19,11 +19,6 @@ public class TeamWinActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(new WhiteBoardView(this, mDataStore));
-		try {
-			Log.i("hihi", mDataStore.getAllPrimitivesAsJSON());
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
 		startService(makeServiceIntent());
 		logIpAddresses();
 	}
