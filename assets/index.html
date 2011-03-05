@@ -43,63 +43,36 @@ var testBoard = function() {
 };
 
 var lastBoard;
-var scaleFactor = 0;
-var boardAspect = 0;
 
-// TODO: Stop resize from running constantly.
-var resize = function() {
+var paint = function() {
 	var board = lastBoard;
-
-	boardAspect = board.aspectRatio;
-	windowAspect = window.innerWidth / window.innerHeight;
-
-	if (boardAspect > 1) {
-		newWidth = window.innerWidth;
-		newHeight = window.innerWidth / boardAspect;
-	}
-	else {
-		newHeight = window.innerHeight;
-		newWidth = window.innerHeight / boardAspect;
-	}
 
 	// Set canvas coordinate system and reset the canvas.
 	var canvas = $('#canvas')[0];
-	canvas.width = newWidth
-	canvas.height = newHeight
-}
-
-var paint = function() {
-	if (scaleFactor == 0)
-		resize();
-
-	var board = lastBoard;
-
-	// Reset the canvas.
-	var canvas = $('#canvas')[0];
-	canvas.width = canvas.width;
-	canvas.height = canvas.height;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerWidth / board.aspectRatio;
 
 	var context = canvas.getContext('2d');
 	context.save();
 
 	context.lineCap = 'round';
 	context.lineJoin = 'round';
-	context.scale(boardAspect * canvas.height, canvas.width);
+	context.scale(canvas.height, canvas.height);
 	$.each(board.primitives, function(index, primitive) {
 		if (!primitive.points)
 			return false;
 
 		context.beginPath();
-		for (var i = 0; i < (primitive.points.length / 2); i++) {
-			var point = primitive.points.slice(i * 2, (i * 2) + 2);
-			if (i == 0) {
-				context.moveTo(point[0], point[1]); // don't paint on first point.
-			} else {
-				context.lineTo(point[0], point[1]);
-			}
+		var lastX = 0;
+		var lastY = 0;
+		for (var point = 0; i < primitive.points.length; i+=2) {
+			var x = primitive.points[point];
+			var y = primitive.points[point+1];
+			path.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+			lastX = x;
+			lastY = y;
 		}
-		// FIXME: Line widths needed in float.
-		context.lineWidth = primitive.strokeWidth * 1.2 * 0.01;
+		context.lineWidth = primitive.strokeWidth;
 		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
@@ -134,7 +107,6 @@ $(document).ready(function() {
 });
 
 $(window).resize(function() {
-	scaleFactor = 0;
 	paint();
 });
 </script>
