@@ -8,7 +8,8 @@
 	<RelativeLayout
 		android:id="@+id/header" 
 		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		style="@style/header">
 		
 		<LinearLayout 
 			android:id="@+id/header"
@@ -28,7 +29,6 @@
 				android:id="@+id/header_remoteurl" 
 				android:layout_height="wrap_content" 
 				android:layout_width="wrap_content" 
-				android:text="Access at: http://192.168.2.3"
 				style="@style/header_remoteurl" />
 				
 		</LinearLayout>
@@ -38,13 +38,16 @@
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
 			android:layout_toRightOf="@id/header"
+			android:gravity="right"
 			android:layout_alignParentRight="true">
 			
 			<Button 
 				android:id="@+id/button_add_whiteboard" 
 				android:layout_width="wrap_content" 
 				android:layout_height="wrap_content" 
-				android:text="Button" />
+				android:layout_gravity="center_vertical"
+				android:text="+"
+				android:minWidth="40dp" />
 		
 		</LinearLayout>
 		
