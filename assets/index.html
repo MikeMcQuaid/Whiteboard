@@ -25,17 +25,13 @@ html, body {
 
 <script>
 var serverTime = 0;
+
 var num = 0;
 var testBoard = function() {
-	// TODO Get it from the network!
 	var primitives = []
-	switch (num) {
-	default:
-		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [0, 100, 100, 200, 200, 100] });
-	case 1:
-		primitives.push({ color: '#FF0000', strokeWidth: 1, points: [0, 50, 100, 150, 200, 50] });
-	case 0:
-		primitives.push({ color: '#000000', strokeWidth: 1, points: [0, 0, 100, 100, 200, 0] });
+	for (var i = 0; i < num; i++) {
+		var baseY = i * 10;
+		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [i, baseY + 100, 100, i * 2 + 200, 200, i + 100] });
 	}
 	num++;
 	return { width: 800, height: 480, primitives: primitives };
@@ -96,6 +92,7 @@ $(document).ready(function() {
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
 		$.get('/board.json', function(board) {
+//			lastBoard = testBoard();
 			lastBoard = board;
 			paint();
 		});

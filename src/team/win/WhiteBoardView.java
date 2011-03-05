@@ -28,26 +28,21 @@ public class WhiteBoardView extends View {
 
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;
-
-	public void resetPoints() {
-		points = new LinkedList<Point>();
-	}
 	
-	public void resetState() {
-		//paint.reset();
-		//path.reset();
-
-		// FIXME: Remove these hacks when we can configure
+	public void defaultState() {
 		paint.setAntiAlias(true);
 		paint.setDither(true);
-		paint.setColor(0xFFFF0000);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStrokeCap(Paint.Cap.ROUND);
-		paint.setStrokeWidth(12);
 	}
-
-	public WhiteBoardView(Context context, DataStore ds) {
+	
+	/**
+	 * Initialise the WhiteBoard state
+	 * @param context ???
+	 * @param ds datastore object used to communicate with HttpServer
+	 */
+	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
 		bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().widthPixels, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
@@ -55,46 +50,26 @@ public class WhiteBoardView extends View {
 		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
 		mDataStore = ds;
 		resetPoints();
-		resetState();
+		defaultState();
+		setPrimColor(color);
+		setPrimStrokeWidth(strokeWidth);
 	}
 	
 	public void setHttpService(HttpService httpService) {
 		this.httpService = httpService;
 	}
 
+	protected void onDraw(Canvas c) {
+		c.drawColor(0xFFAAAAAA);
+		c.drawBitmap(bitmap, 0, 0, paint);
+		c.drawPath(path, paint);
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-	}
-
-	private void touchStart(float x, float y) {
-		resetPoints();
-		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
-		points.add(new Point((int) x, (int) y));
-		path.moveTo(x, y);
-		mX = x;
-		mY = y;
-	}
-
-	private void touchMove(float x, float y) {
-		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
-		points.add(new Point((int) x, (int) y));
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
-		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-			mX = x;
-			mY = y;
-		}
-	}
-
-	private void touchUp() {
-		path.lineTo(mX, mY);
-		mDataStore.add(new Primitive(paint, points));
-		System.out.println(mDataStore.getAllPrimitivesAsJSON());
-		if (httpService != null) {
-			httpService.setDataStore(mDataStore);
-		}
+		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(bitmap);
 	}
 
 	@Override
@@ -118,14 +93,66 @@ public class WhiteBoardView extends View {
 		}
 		return true;
 	}
+	
+	private void touchStart(float x, float y) {
+		resetPoints();
+		points.add(new Point((int) x, (int) y));
+		mDataStore.add(new Primitive(paint, points));
+		
+		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
+		points.add(new Point((int) x, (int) y));
+		path.moveTo(x, y);
+		mX = x;
+		mY = y;
+	}
 
-	protected void onDraw(Canvas c) {
-		c.drawColor(0xFFAAAAAA);
-		c.drawBitmap(bitmap, 0, 0, paint);
-		c.drawPath(path, paint);
+	private void touchMove(float x, float y) {
+		points.add(new Point((int) x, (int) y));
+		mDataStore.remove(mDataStore.size() - 1);
+		mDataStore.add(new Primitive(paint, points));
+		
+		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
+		points.add(new Point((int) x, (int) y));
+		float dx = Math.abs(x - mX);
+		float dy = Math.abs(y - mY);
+		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+			path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+			mX = x;
+			mY = y;
+		}
+	}
+
+	private void touchUp() {
+		path.lineTo(mX, mY);
+		canvas.drawPath(path, paint);
+		path.reset();
+		mDataStore.add(new Primitive(paint, points));
+		resetPoints();
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
+		}
+	}
+	
+	public void resetPoints() {
+		points = new LinkedList<Point>();
+	}
+	
+	public void resetState() {
+		// FIXME: Remove these hacks when we can configure
+		paint.setAntiAlias(true);
+		paint.setDither(true);
+		paint.setColor(0xFFFF0000);
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeJoin(Paint.Join.ROUND);
+		paint.setStrokeCap(Paint.Cap.ROUND);
+		paint.setStrokeWidth(12);
 	}
 
 	protected void setPrimColor(int c) {
 		paint.setColor(c);
+	}
+
+	protected void setPrimStrokeWidth(int c) {
+		paint.setStrokeWidth(c);
 	}
 }
