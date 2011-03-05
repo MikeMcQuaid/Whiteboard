@@ -65,10 +65,13 @@ var paint = function() {
 		context.beginPath();
 		var lastX = 0;
 		var lastY = 0;
-		for (var point = 0; i < primitive.points.length; i+=2) {
-			var x = primitive.points[point];
+		for (var point = 0; point < primitive.points.length; point+=2) {
+			var x = primitive.points[point] * board.aspectRatio;
 			var y = primitive.points[point+1];
-			path.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+			if (lastX && lastY)
+				context.quadraticCurveTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+			else
+				context.moveTo(x, y);
 			lastX = x;
 			lastY = y;
 		}
