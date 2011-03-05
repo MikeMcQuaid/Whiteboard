@@ -13,17 +13,25 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 
 public class HttpService extends Service {
 	
+	private final IBinder binder = new HttpServiceBinder();
+	
+	private DataStore dataStore;
 	private Server server;
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null; // clients cannot bind to this service
+	
+	public void setDataStore(DataStore dataStore) {
+		this.dataStore = dataStore;
 	}
-
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
@@ -52,16 +60,28 @@ public class HttpService extends Service {
 	}
 	
 	private class Handler extends AbstractHandler {
-		public void handle(String target, Request baseRequest, HttpServletRequest request,
-				HttpServletResponse response) throws IOException, ServletException {
-			if (target.equals("/")) {
-				handleIndex(request, response);
-			} else if (target.startsWith("/time")) {
-				handleTime(request, response);
-			} else {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+			try {
+				if (target.equals("/")) {
+					handleIndex(request, response);
+				} else if (target.startsWith("/time")) {
+					handleTime(request, response);
+				} else if (target.startsWith("/board.json")) {
+					handleBoard(request, response);
+				} else {
+					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				}
+			} catch (Exception e) {
+				handleError(response, e);
 			}
 			baseRequest.setHandled(true);
+		}
+
+		private void handleError(HttpServletResponse response, Exception e)
+				throws IOException {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setContentType("text/plain");
+			e.printStackTrace(response.getWriter());
 		}
 		
 		private void handleIndex(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -76,6 +96,20 @@ public class HttpService extends Service {
 			response.getOutputStream().println(System.currentTimeMillis());
 		}
 		
+		private void handleBoard(HttpServletRequest request, HttpServletResponse response) throws IOException {
+			if (dataStore != null) {
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("application/json");
+				response.getWriter().print(dataStore.getAllPrimitivesAsJSON());
+			} else {
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			}
+		}
 	}
 	
+	public class HttpServiceBinder extends Binder {
+		public HttpService getService() {
+			return HttpService.this;
+		}
+	};
 }

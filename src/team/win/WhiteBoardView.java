@@ -3,8 +3,6 @@ package team.win;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONException;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -19,12 +17,14 @@ import android.view.View;
 
 public class WhiteBoardView extends View {
 
+	private final DataStore mDataStore;
+	
 	private Bitmap bitmap;
 	private Canvas canvas;
 	private Paint paint = new Paint();
 	private Path path = new Path();
 	private List<Point> points;
-	private DataStore mDataStore;
+	private HttpService httpService;
 
 	private float mX, mY;
 	private static final float TOUCH_TOLERANCE = 4;
@@ -57,6 +57,10 @@ public class WhiteBoardView extends View {
 		resetPoints();
 		resetState();
 	}
+	
+	public void setHttpService(HttpService httpService) {
+		this.httpService = httpService;
+	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -87,10 +91,9 @@ public class WhiteBoardView extends View {
 	private void touchUp() {
 		path.lineTo(mX, mY);
 		mDataStore.add(new Primitive(paint, points));
-		try {
-			System.out.println(mDataStore.getAllPrimitivesAsJSON());
-		} catch (JSONException e) {
-			e.printStackTrace();
+		System.out.println(mDataStore.getAllPrimitivesAsJSON());
+		if (httpService != null) {
+			httpService.setDataStore(mDataStore);
 		}
 	}
 
@@ -120,5 +123,9 @@ public class WhiteBoardView extends View {
 		c.drawColor(0xFFAAAAAA);
 		c.drawBitmap(bitmap, 0, 0, paint);
 		c.drawPath(path, paint);
+	}
+
+	protected void setPrimColor(int c) {
+		paint.setColor(c);
 	}
 }
