@@ -4,8 +4,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
-import org.json.JSONException;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,20 +11,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class TeamWinActivity extends Activity {
 	
 	private static final String TAG = "TeamWinActivity";
 
-	private DataStore mDataStore = new DataStore();
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(new WhiteBoardView(this, mDataStore));
+		setContentView(R.layout.main);
 		startService(makeServiceIntent());
 		logIpAddresses();
+		
+		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
+		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
+			}
+		});
 	}
 
 	@Override
@@ -71,7 +78,8 @@ public class TeamWinActivity extends Activity {
 			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
 				NetworkInterface networkInterface = networkInterfaces.nextElement();
 				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
-					Log.e("teamwin", inetAddresses.nextElement().toString());
+					TextView remoteUrl = (TextView) findViewById(R.id.header_appinfo_remoteurl);
+					remoteUrl.setText(inetAddresses.nextElement().toString());
 				}
 			}
 		} catch (Exception e) {

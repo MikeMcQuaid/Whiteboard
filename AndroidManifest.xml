@@ -20,6 +20,11 @@
 			</intent-filter>
 		</activity>
 		
+		<activity 
+			android:name=".WhiteBoardActivity"
+			android:theme="@android:style/Theme.NoTitleBar">
+		</activity>
+		
 		<service android:name="HttpService"></service>
 
 	</application>

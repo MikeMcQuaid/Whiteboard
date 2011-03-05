@@ -20,6 +20,7 @@ public final class R {
         public static final int header_appinfo_name=0x7f060002;
         public static final int header_appinfo_remoteurl=0x7f060003;
         public static final int header_quickactions=0x7f060004;
+        public static final int menu_save=0x7f060008;
         public static final int menu_shutdown=0x7f060007;
         public static final int whiteboards=0x7f060006;
     }
@@ -28,11 +29,13 @@ public final class R {
     }
     public static final class menu {
         public static final int main_menu=0x7f050000;
+        public static final int whiteboard_menu=0x7f050001;
     }
     public static final class string {
         /**  Application details 
          */
         public static final int app_name=0x7f040000;
+        public static final int menu_save=0x7f040002;
         /**  Labels for menu items, buttons etc. 
          */
         public static final int menu_shutdown=0x7f040001;
