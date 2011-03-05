@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 public class WhiteBoardActivity extends Activity {
 	
@@ -31,6 +32,8 @@ public class WhiteBoardActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore);
 		setContentView(mWhiteBoardView);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 	}
