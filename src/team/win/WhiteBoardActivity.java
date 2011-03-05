@@ -85,13 +85,13 @@ public class WhiteBoardActivity extends Activity {
 			return true;
 		case R.id.menu_color:
 			mWhiteBoardView.setPrimColor(
-				Color.argb(mRandomSource.nextInt(255),
+				Color.argb(255,
 						   mRandomSource.nextInt(255),
 						   mRandomSource.nextInt(255),
 						   mRandomSource.nextInt(255)));
 			return true;
 		default:
-			return super.onContextItemSelected(item);
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
