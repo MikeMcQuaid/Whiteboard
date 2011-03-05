@@ -19,12 +19,17 @@ html, body {
 </style>
 </head>
 <body>
+<div>
 <canvas id="canvas">
 	Your browser does not support HTML5 canvas
 </canvas>
+</div>
 
+<div>
+<a id="download" href="">Download</a>
+</div>
 <script>
-var serverTime = 0;
+var serverTimeStamp = 0;
 
 var num = 0;
 var testBoard = function() {
@@ -39,18 +44,13 @@ var testBoard = function() {
 
 var lastBoard;
 var scaleFactor = 0;
+var boardAspect = 0;
 
 // TODO: Stop resize from running constantly.
 var resize = function() {
 	var board = lastBoard;
 
-	// Set canvas coordinate system to the same as the device and reset the canvas.
-	var canvas = $('#canvas')[0];
-	canvas.width = board.width;
-	canvas.height = board.height;
-
-	// Use CSS to scale the canvas to the window.
-	boardAspect = board.width / board.height;
+	boardAspect = board.aspectRatio;
 	windowAspect = window.innerWidth / window.innerHeight;
 
 	if (boardAspect > 1) {
@@ -62,9 +62,10 @@ var resize = function() {
 		newWidth = window.innerHeight / boardAspect;
 	}
 
+	// Set canvas coordinate system and reset the canvas.
+	var canvas = $('#canvas')[0];
 	canvas.width = newWidth
 	canvas.height = newHeight
-	scaleFactor = canvas.width/board.width;
 }
 
 var paint = function() {
@@ -83,8 +84,11 @@ var paint = function() {
 
 	context.lineCap = 'round';
 	context.lineJoin = 'round';
-	context.scale(scaleFactor, scaleFactor);
+	context.scale(boardAspect * canvas.height, canvas.width);
 	$.each(board.primitives, function(index, primitive) {
+		if (!primitive.points)
+			return false;
+
 		context.beginPath();
 		for (var i = 0; i < (primitive.points.length / 2); i++) {
 			var point = primitive.points.slice(i * 2, (i * 2) + 2);
@@ -94,7 +98,8 @@ var paint = function() {
 				context.lineTo(point[0], point[1]);
 			}
 		}
-		context.lineWidth = primitive.strokeWidth * 1.2;
+		// FIXME: Line widths needed in float.
+		context.lineWidth = primitive.strokeWidth * 1.2 * 0.01;
 		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
@@ -102,16 +107,15 @@ var paint = function() {
 
 	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
-	if (serverTime)
-		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 	context.restore();
+
+	$('#download').attr('href', canvas.toDataURL('image/png'));
 };
 
 $(document).ready(function() {
-	var fetchTime = function() {
-		$.get('/time', function(time) {
-			$('#time').html(time);
-			serverTime = time;
+	var fetchTimeStamp = function() {
+		$.get('/timestamp', function(time) {
+			serverTimeStamp = time;
 		});
 	};
 	
@@ -124,7 +128,7 @@ $(document).ready(function() {
 		});
 	};
 	
-	window.setInterval(fetchTime, 1000);
+	//window.setInterval(fetchTimeStamp, 1000);
 	window.setInterval(refreshBoard, 500);
 	paint();
 });
