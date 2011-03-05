@@ -14,11 +14,13 @@ public class WhiteBoardActivity extends Activity {
 	private static final String TAG = "WhiteBoardActivity";
 
 	private DataStore mDataStore = new DataStore();
+	private WhiteBoardView mWhiteBoardView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(new WhiteBoardView(this, mDataStore));
+		mWhiteBoardView = new WhiteBoardView(this, mDataStore);
+		setContentView(mWhiteBoardView);
 	}
 
 	@Override
@@ -32,6 +34,8 @@ public class WhiteBoardActivity extends Activity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
+			return true;
+		case R.id.menu_widget:
 			return true;
 		default:
 			return super.onContextItemSelected(item);
