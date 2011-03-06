@@ -24,23 +24,27 @@ public class WhiteBoardView extends View {
 	private HttpService httpService;
 
 	private float mX, mY;
+	private float mWidth, mHeight;
 	private static final float TOUCH_TOLERANCE = 4;
 
 	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
-		int w = getResources().getDisplayMetrics().widthPixels;
-		int h = getResources().getDisplayMetrics().widthPixels;
-		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
-		canvas = new Canvas(bitmap);
-		Log.i("WidthHeight", String.format("%d %d", w, h));
-		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
 		mDataStore = ds;
 		resetPoints();
 		initPaintState();
 		setPrimColor(color);
 		setPrimStrokeWidth(strokeWidth);
-        mDataStore.setWidth(w);
-        mDataStore.setHeight(h);
+		initSize(getResources().getDisplayMetrics().widthPixels,
+				 getResources().getDisplayMetrics().heightPixels);
+		Log.i("ClipBounds", canvas.getClipBounds().toShortString());
+	}
+
+	private void initSize(float w, float h) {
+		bitmap = Bitmap.createBitmap((int)w, (int)h, Bitmap.Config.RGB_565);
+        canvas = new Canvas(bitmap);
+        mDataStore.setAspectRatio(w / h);
+        mWidth = w;
+        mHeight = h;
 	}
 
 	private void initPaintState() {
@@ -60,14 +64,11 @@ public class WhiteBoardView extends View {
 		c.drawBitmap(bitmap, 0, 0, paint);
 		c.drawPath(path, paint);
 	}
-	
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        mDataStore.setWidth(w);
-        mDataStore.setHeight(h);
+		initSize(w, h);
 	}
 
 	@Override
@@ -94,35 +95,30 @@ public class WhiteBoardView extends View {
 	
 	private void touchStart(float x, float y) {
 		resetPoints();
-		points.add(new Point((int) x, (int) y));
-		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
+		points.add(new Point(x / mWidth, y / mHeight));
+		mDataStore.add(new Primitive(paint.getStrokeWidth() / mWidth, paint.getColor(), points));
 		
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
-		points.add(new Point((int) x, (int) y));
 		path.moveTo(x, y);
 		mX = x;
 		mY = y;
 	}
 
 	private void touchMove(float x, float y) {
-		points.add(new Point((int) x, (int) y));
+		points.add(new Point(x / mWidth, y / mHeight));
 		mDataStore.remove(mDataStore.size() - 1);
-		mDataStore.add(new Primitive((int)paint.getStrokeWidth(), paint.getColor(), points));
+		mDataStore.add(new Primitive(paint.getStrokeWidth() / mWidth, paint.getColor(), points));
 		if (httpService != null) {
 			httpService.setDataStore(mDataStore);
 		}
 
 		Log.i("Move", String.format("mouse_down detected at (%f.0, %f.0)", x, y));
-		points.add(new Point((int) x, (int) y));
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
 			path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
 			mX = x;
 			mY = y;
-		}
-		if (httpService != null) {
-			httpService.setDataStore(mDataStore);
 		}
 	}
 
@@ -137,8 +133,7 @@ public class WhiteBoardView extends View {
 		points = new LinkedList<Point>();
 	}
 	
-	public Paint getPaint()
-	{
+	public Paint getPaint() {
 		return this.paint;
 	}
 

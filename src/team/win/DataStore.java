@@ -13,8 +13,7 @@ import org.json.JSONObject;
 
 public class DataStore {
 	private LinkedList<Primitive> mPrimitiveList;
-	private int mWidth;
-	private int mHeight;
+	private float mAspectRatio;
 
 	public DataStore() {
 		super();
@@ -33,12 +32,8 @@ public class DataStore {
 		return mPrimitiveList.size();
 	}
 
-	public void setWidth(int width) {
-		mWidth = width;
-	}
-
-	public void setHeight(int height) {
-		mHeight = height;
+	public void setAspectRatio(float aspectRatio) {
+		mAspectRatio = aspectRatio;
 	}
 
 	public String getAllPrimitivesAsJSON() {
@@ -51,14 +46,13 @@ public class DataStore {
 					pointArray.put(point.mY);
 				}
 				JSONObject primObject = new JSONObject();
-				primObject.put("color", Integer.toHexString(primitive.mColor));
+				primObject.put("color", String.format("%06x", primitive.mColor));
 				primObject.put("strokeWidth", primitive.mStrokeWidth);
 				primObject.put("points", pointArray);
 				primitives.put(primObject);
 			}
 			JSONObject o = new JSONObject();
-			o.put("width", mWidth);
-			o.put("height", mHeight);
+			o.put("aspectRatio", mAspectRatio);
 			o.put("primitives", primitives);
 			return o.toString();
 		} catch (JSONException e) {
