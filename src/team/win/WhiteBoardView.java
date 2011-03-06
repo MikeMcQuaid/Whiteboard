@@ -68,13 +68,13 @@ public class WhiteBoardView extends View {
 	}
 
 	protected void onDraw(Canvas c) {
-		if (needsRedraw) {
+//		if (needsRedraw) {
 			// mDataStore.remove(mDataStore.size() - 1);
 			Paint temp = new Paint();
 			temp.setColor(Color.WHITE);
 			temp.setStyle(Paint.Style.FILL);
 			c.drawRect(0, 0, mWidth, mHeight, temp);
-		}
+//		}
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
 			mPaint.setColor(p.mColor | 0xFF000000);
