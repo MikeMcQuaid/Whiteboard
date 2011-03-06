@@ -89,7 +89,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		if (position == 0) {
 			startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
 		} else {
-			startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position).id));
+			startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position - 1).id));
 		}
 	}
 
