@@ -16,9 +16,12 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 public class HttpService extends Service {
+	
+	private static final String TAG = Utils.buildLogTag(HttpService.class);
 	
 	public static final int PORT_NUMBER = 8080;
 
@@ -44,33 +47,33 @@ public class HttpService extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		return binder;
-	}
-	
-	@Override
-	public synchronized int onStartCommand(Intent intent, int flags, int startId) {
-		super.onStartCommand(intent, flags, startId);
-		
-		if (!server.isRunning()) {
-			try {
-				server.start();
-			} catch (Exception e) {
-				Log.w("Teamwin", "Unable to start server", e);
-				Toast.makeText(getApplicationContext(), "Unable to start server: " + e.getMessage(), 3).show();
-			}
+		if (server.isRunning()) {
+			Log.i(TAG, "Not starting server as it is already running");
+			return binder;
 		}
-		
-		return START_STICKY;
+			
+		try {
+			server.start();
+			Log.i(TAG, "Started server");
+			Toast toast = Toast.makeText(this, Utils.getFormattedUrl(getResources()), 3);
+			toast.setGravity(Gravity.TOP, 0, 0);
+			toast.show();
+		} catch (Exception e) {
+			Log.w(TAG, "Unable to start server", e);
+			Toast.makeText(this, "Unable to start server: " + e.getMessage(), 3).show();
+		}
+		return binder;
 	}
 	
 	@Override
 	public synchronized void onDestroy() {
 		super.onDestroy();
-		
 		try {
 			server.stop();
+			Log.i(TAG, "Stopped server");
+			Toast.makeText(this, R.string.label_stopping_whiteboard, 3).show();
 		} catch (Exception e) {
-			Log.w("Teamwin", "Unable to stop server", e);
+			Log.w(TAG, "Unable to stop server", e);
 			Toast.makeText(this, "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
@@ -85,9 +88,11 @@ public class HttpService extends Service {
 				} else if (target.startsWith("/board.json")) {
 					handleBoard(request, response);
 				} else {
+					Log.w(TAG, "No handler defined for " + target);
 					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				}
 			} catch (Exception e) {
+				Log.e(TAG, "Failed to handle request for " + target, e);
 				handleError(response, e);
 			}
 			baseRequest.setHandled(true);

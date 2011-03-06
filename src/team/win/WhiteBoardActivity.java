@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -35,10 +36,10 @@ import android.widget.Toast;
 
 public class WhiteBoardActivity extends Activity {
 	
+	private static final String TAG = Utils.buildLogTag(WhiteBoardActivity.class);
+
 	private static final int STROKE_WIDTH_DIALOG_ID = 0;
 	private static final int COLOR_PICKER_DIALOG_ID = 1;
-	
-	private static final String TAG = "TW_WhiteBoardActivity";
 	
 	private static final String WHITEBOARD_DATA_FOLDER_PATH;
 	static {
@@ -110,14 +111,18 @@ public class WhiteBoardActivity extends Activity {
 		
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
-		
-		bindService(makeServiceIntent(), serviceConnection, 0);
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		showFormattedUrl();
+	protected void onStart() {
+		super.onStart();
+		bindService(makeServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unbindService(serviceConnection);
 	}
 
 	private Intent makeServiceIntent() {
@@ -237,13 +242,13 @@ public class WhiteBoardActivity extends Activity {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.w("teamwin", "Service connected");
+			Log.w(TAG, "Service connected");
 			mWhiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
 		}
 		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			Log.w("teamwin", "Service disconnected");
+			Log.w(TAG, "Service disconnected");
 		}
 	};
 	

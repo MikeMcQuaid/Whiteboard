@@ -13,10 +13,14 @@ import android.view.MenuItem;
 
 public class Utils {
 
-	private static final String LOG_TAG = "TeamWin";
+	private static final String LOG_TAG = buildLogTag(Utils.class);
 
 	private Utils() {
 		throw new AssertionError("Utility class");
+	}
+	
+	public static String buildLogTag(Class<?> clazz) {
+		return "TW_" + clazz.getSimpleName();
 	}
 	
 	public static Method quietGetMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
