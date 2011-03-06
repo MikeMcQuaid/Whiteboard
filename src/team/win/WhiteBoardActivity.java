@@ -94,8 +94,9 @@ public class WhiteBoardActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.whiteboard_menu, menu);
+		getMenuInflater().inflate(R.menu.whiteboard_menu, menu);
+		// Show menu options in Honeycomb action bar
+		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_erase });
 		return true;
 	}
 
