@@ -8,8 +8,6 @@ public class Point implements Serializable {
 	float mX;
 	float mY;
 	Point(float x, float y) {
-		if(x < 0.0 || y < 0.0 || x > 1.0 || y > 1.0)
-			throw new RuntimeException("All fucked");
 		mX = x;
 		mY = y;
 	}
