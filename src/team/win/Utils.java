@@ -1,7 +1,12 @@
 package team.win;
 
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,5 +72,32 @@ public class Utils {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Returns the nicely formatted IP address.
+	 * 
+	 * @return for example: "Access at: http://1.2.3.4:8080/"
+	 */
+	public static String getFormattedUrl(Resources resources) {
+		Enumeration<NetworkInterface> networkInterfaces;
+		try {
+			networkInterfaces = NetworkInterface.getNetworkInterfaces();
+		} catch (SocketException e) {
+			Log.e(LOG_TAG, "Could not enumerate network interfaces", e);
+			return resources.getString(R.string.error_remoteurl);
+		}
+		
+		String remoteUrlFormat = resources.getString(R.string.label_remoteurl);
+		while (networkInterfaces.hasMoreElements()) {
+			NetworkInterface networkInterface = networkInterfaces.nextElement();
+			for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
+				InetAddress inetAddress = inetAddresses.nextElement();
+				if (!inetAddress.isLoopbackAddress()) {
+					return String.format(remoteUrlFormat, inetAddress.toString(), HttpService.PORT_NUMBER);
+				}
+			}
+		}
+		return resources.getString(R.string.error_remoteurl);
 	}
 }

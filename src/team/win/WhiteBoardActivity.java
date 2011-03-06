@@ -114,10 +114,14 @@ public class WhiteBoardActivity extends Activity {
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 		mUndoManager.setContentView(mWhiteBoardView);
-
-
 	}
-	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		showFormattedUrl();
+	}
+
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
 		intent.setClass(getApplicationContext(), HttpService.class);
@@ -134,10 +138,14 @@ public class WhiteBoardActivity extends Activity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		Toast toast = Toast.makeText(this, "IP address", 3);
+		showFormattedUrl();
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	private void showFormattedUrl() {
+		Toast toast = Toast.makeText(this, Utils.getFormattedUrl(getResources()), 3);
 		toast.setGravity(Gravity.TOP, 0, 0);
 		toast.show();
-		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
