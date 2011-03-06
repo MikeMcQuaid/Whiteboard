@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -46,7 +47,7 @@ public class HttpService extends Service {
 	}
 	
 	@Override
-	public IBinder onBind(Intent intent) {
+	public synchronized IBinder onBind(Intent intent) {
 		if (server.isRunning()) {
 			Log.i(TAG, "Not starting server as it is already running");
 			return binder;
@@ -77,7 +78,7 @@ public class HttpService extends Service {
 			Toast.makeText(this, "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
-	
+
 	private class Handler extends AbstractHandler {
 		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 			try {
@@ -128,4 +129,9 @@ public class HttpService extends Service {
 		}
 	}
 	
+	static Intent makeServiceIntent(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, HttpService.class);
+		return intent;
+	}
 }

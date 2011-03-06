@@ -8,9 +8,13 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -50,6 +54,27 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		setListAdapter(listAdapter);
 		
 		registerForContextMenu(findViewById(android.R.id.list));
+	}
+
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override public void onServiceDisconnected(ComponentName name) {
+			// TODO Could update the UI here
+		}
+		@Override public void onServiceConnected(ComponentName name, IBinder service) {
+			// TODO Could update the UI here
+		}
+	};
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		bindService(HttpService.makeServiceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unbindService(serviceConnection);
 	}
 
 	@Override

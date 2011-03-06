@@ -16,7 +16,6 @@ import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -116,19 +115,13 @@ public class WhiteBoardActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		bindService(makeServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
+		bindService(HttpService.makeServiceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
 		unbindService(serviceConnection);
-	}
-
-	private Intent makeServiceIntent() {
-		Intent intent = new Intent();
-		intent.setClass(getApplicationContext(), HttpService.class);
-		return intent;
 	}
 
 	@Override
