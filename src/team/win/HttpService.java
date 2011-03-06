@@ -12,11 +12,11 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Gravity;
 import android.widget.Toast;
 
 public class HttpService extends Service {
@@ -46,7 +46,7 @@ public class HttpService extends Service {
 	}
 	
 	@Override
-	public IBinder onBind(Intent intent) {
+	public synchronized IBinder onBind(Intent intent) {
 		if (server.isRunning()) {
 			Log.i(TAG, "Not starting server as it is already running");
 			return binder;
@@ -55,9 +55,6 @@ public class HttpService extends Service {
 		try {
 			server.start();
 			Log.i(TAG, "Started server");
-			Toast toast = Toast.makeText(this, Utils.getFormattedUrl(getResources()), 3);
-			toast.setGravity(Gravity.TOP, 0, 0);
-			toast.show();
 		} catch (Exception e) {
 			Log.w(TAG, "Unable to start server", e);
 			Toast.makeText(this, "Unable to start server: " + e.getMessage(), 3).show();
@@ -74,10 +71,9 @@ public class HttpService extends Service {
 			Toast.makeText(this, R.string.label_stopping_whiteboard, 3).show();
 		} catch (Exception e) {
 			Log.w(TAG, "Unable to stop server", e);
-			Toast.makeText(this, "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
-	
+
 	private class Handler extends AbstractHandler {
 		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 			try {
@@ -128,4 +124,9 @@ public class HttpService extends Service {
 		}
 	}
 	
+	static Intent makeServiceIntent(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, HttpService.class);
+		return intent;
+	}
 }

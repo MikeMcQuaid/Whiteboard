@@ -16,7 +16,6 @@ import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -36,7 +35,7 @@ import android.widget.Toast;
 
 public class WhiteBoardActivity extends Activity {
 	
-	private static final String TAG = Utils.buildLogTag(WhiteBoardActivity.class);
+	static final String TAG = Utils.buildLogTag(WhiteBoardActivity.class);
 
 	private static final int STROKE_WIDTH_DIALOG_ID = 0;
 	private static final int COLOR_PICKER_DIALOG_ID = 1;
@@ -116,19 +115,13 @@ public class WhiteBoardActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		bindService(makeServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
+		bindService(HttpService.makeServiceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
 		unbindService(serviceConnection);
-	}
-
-	private Intent makeServiceIntent() {
-		Intent intent = new Intent();
-		intent.setClass(getApplicationContext(), HttpService.class);
-		return intent;
 	}
 
 	@Override
@@ -242,13 +235,16 @@ public class WhiteBoardActivity extends Activity {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.w(TAG, "Service connected");
 			mWhiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
+			
+			Toast toast = Toast.makeText(WhiteBoardActivity.this, Utils.getFormattedUrl(getResources()), 3);
+			toast.setGravity(Gravity.TOP, 0, 0);
+			toast.show();
 		}
-		
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			Log.w(TAG, "Service disconnected");
+			Toast.makeText(WhiteBoardActivity.this, R.string.label_stopping_whiteboard, 3).show();
 		}
 	};
 	

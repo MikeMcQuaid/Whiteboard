@@ -8,9 +8,13 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -41,7 +45,6 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		displayRemoteUrl();
 		
 		databaseHelper = new DatabaseHelper(this);
 		existingWhiteBoards = databaseHelper.getWhiteBoards();
@@ -50,6 +53,30 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		setListAdapter(listAdapter);
 		
 		registerForContextMenu(findViewById(android.R.id.list));
+	}
+
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override public void onServiceConnected(ComponentName name, IBinder service) {
+			TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
+			remoteUrlTextView.setText(Utils.getFormattedUrl(getResources()));
+			
+		}
+		@Override public void onServiceDisconnected(ComponentName name) {
+			TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
+			remoteUrlTextView.setText(R.string.label_stopping_whiteboard);
+		}
+	};
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		bindService(HttpService.makeServiceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unbindService(serviceConnection);
 	}
 
 	@Override
@@ -69,12 +96,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_shutdown:
-			// TODO We need to properly shutdown the HTTP server.
-			// We want to allow the user to switch to other applications
-			// whilst the whiteboard is running and still give the user the ability to
-			// explicitly shutdown the application and stop the web server.
-			finish();
+		case R.id.menu_help:
+			startActivity(new Intent(this, HelpActivity.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
