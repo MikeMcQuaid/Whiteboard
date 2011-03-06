@@ -55,8 +55,18 @@ var paint = function() {
 
 	// Set canvas coordinate system and reset the canvas.
 	var canvas = $('#canvas')[0];
-	canvas.width = window.innerWidth * 0.9;
-	canvas.height = canvas.width / board.aspectRatio;
+	containerWidth = window.innerWidth * 0.9;
+	containerHeight = window.innerHeight * 0.8;
+	windowAspectRatio = containerWidth / containerHeight;
+	if (windowAspectRatio < board.aspectRatio) {
+		canvas.width = window.innerWidth * 0.9;
+		canvas.height = canvas.width / board.aspectRatio;
+	}
+	else {
+		canvas.height = window.innerHeight * 0.8;
+		canvas.width = canvas.height * board.aspectRatio;
+	}
+
 	$('#container').css( { width: canvas.width + 2 + 'px' } );
 
 	var context = canvas.getContext('2d');
