@@ -222,6 +222,9 @@ public class WhiteBoardActivity extends Activity {
 			}
 			
 			saveToSdCard();
+			
+			whiteBoard.lastModified = System.currentTimeMillis();
+			databaseHelper.addWhiteBoard(whiteBoard);
 		} catch (IOException e) {
 			new AlertDialog.Builder(this)
 				.setCancelable(false)
