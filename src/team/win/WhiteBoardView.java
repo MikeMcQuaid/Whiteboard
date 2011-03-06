@@ -25,8 +25,6 @@ public class WhiteBoardView extends View {
 	private float mStrokeWidth;
 	private float mX, mY;
 	private int mColor;
-	
-	private boolean needsRedraw;
 
 	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
@@ -59,22 +57,18 @@ public class WhiteBoardView extends View {
 		this.mHttpService = httpService;
 	}
 	
-	public void setNeedsRedraw() {
+	public void undo() {
 		if (mDataStore.size() <= 0)
 			return;
-		needsRedraw = true;
 		mDataStore.remove(mDataStore.size() - 1);
 		invalidate();
 	}
 
 	protected void onDraw(Canvas c) {
-//		if (needsRedraw) {
-			// mDataStore.remove(mDataStore.size() - 1);
-			Paint temp = new Paint();
-			temp.setColor(Color.WHITE);
-			temp.setStyle(Paint.Style.FILL);
-			c.drawRect(0, 0, mWidth, mHeight, temp);
-//		}
+		Paint temp = new Paint();
+		temp.setColor(Color.WHITE);
+		temp.setStyle(Paint.Style.FILL);
+		c.drawRect(0, 0, mWidth, mHeight, temp);
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
 			mPaint.setColor(p.mColor | 0xFF000000);
@@ -94,8 +88,6 @@ public class WhiteBoardView extends View {
 			}
 			c.drawPath(path, mPaint);
 		}
-
-		needsRedraw = false;
 	}
 
 	@Override
