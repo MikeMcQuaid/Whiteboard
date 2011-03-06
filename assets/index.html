@@ -30,18 +30,6 @@ html, body {
 </div>
 <script>
 var lastPrimitivesCount = 0;
-
-var num = 0;
-var testBoard = function() {
-	var primitives = []
-	for (var i = 0; i < num; i++) {
-		var baseY = i * 10;
-		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [i, baseY + 100, 100, i * 2 + 200, 200, i + 100] });
-	}
-	num++;
-	return { width: 800, height: 480, primitives: primitives };
-};
-
 var lastBoard;
 
 var paint = function() {
@@ -102,7 +90,6 @@ $(document).ready(function() {
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
 		$.get('/board.json', function(board) {
-//			lastBoard = testBoard();
 			lastBoard = board;
 			paint();
 		});
