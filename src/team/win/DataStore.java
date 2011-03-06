@@ -32,6 +32,10 @@ public class DataStore {
 		return mPrimitiveList.size();
 	}
 
+	public void clear() {
+		mPrimitiveList.clear();
+	}
+
 	public void setAspectRatio(float aspectRatio) {
 		mAspectRatio = aspectRatio;
 	}

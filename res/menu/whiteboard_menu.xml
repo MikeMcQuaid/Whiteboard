@@ -24,5 +24,4 @@
 		android:id="@+id/menu_save"
 		android:icon="@android:drawable/ic_menu_save"
 		android:title="@string/menu_save"/>
-		
 </menu>
