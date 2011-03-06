@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
-		android:icon="@android:drawable/ic_menu_gallery"
+		android:icon="@android:drawable/ic_menu_edit"
 		android:title="@string/menu_stroke_width"
 		android:id="@+id/menu_stroke_width"/>
 	<item
 		android:title="@string/menu_color"
 		android:id="@+id/menu_color"
-		android:icon="@android:drawable/ic_menu_preferences"/>
+		android:icon="@android:drawable/ic_menu_gallery"/>
 	<item
-		android:title="@string/menu_erase"
-		android:id="@+id/menu_erase"
+		android:title="@string/menu_eraser"
+		android:id="@+id/menu_eraser"
 		android:icon="@android:drawable/ic_menu_revert"/>
 	<item 
 		android:id="@+id/menu_save"
@@ -22,6 +22,6 @@
 		android:title="@string/menu_load"/>
 	<item 
 		android:id="@+id/menu_clear"
-		android:icon="@android:drawable/ic_menu_revert"
+		android:icon="@android:drawable/ic_menu_close_clear_cancel"
 		android:title="@string/menu_clear"/>
 </menu>

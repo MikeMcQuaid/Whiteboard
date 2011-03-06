@@ -11,15 +11,15 @@ html, body {
 	padding: 0;
 }
 
-#canvas {
+#container {
+	border: 1px green solid;
 	margin-left: auto;
 	margin-right: auto;
-	position: absolute;
 }
 </style>
 </head>
 <body>
-<div>
+<div id="container">
 <canvas id="canvas">
 	Your browser does not support HTML5 canvas
 </canvas>
@@ -29,19 +29,7 @@ html, body {
 <a id="download" href="">Download</a>
 </div>
 <script>
-var serverTimeStamp = 0;
-
-var num = 0;
-var testBoard = function() {
-	var primitives = []
-	for (var i = 0; i < num; i++) {
-		var baseY = i * 10;
-		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [i, baseY + 100, 100, i * 2 + 200, 200, i + 100] });
-	}
-	num++;
-	return { width: 800, height: 480, primitives: primitives };
-};
-
+var lastPrimitivesCount = 0;
 var lastBoard;
 
 var paint = function() {
@@ -49,6 +37,7 @@ var paint = function() {
 
 	// Set canvas coordinate system and reset the canvas.
 	var canvas = $('#canvas')[0];
+	var container = $('#container')[0];
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerWidth / board.aspectRatio;
 
@@ -61,6 +50,8 @@ var paint = function() {
 	$.each(board.primitives, function(index, primitive) {
 		if (!primitive.points)
 			return false;
+
+		lastPrimitivesCount = primitive.points.length;
 
 		context.beginPath();
 		var lastX = 0;
@@ -81,30 +72,27 @@ var paint = function() {
 	});
 	context.restore();
 
-	context.save();
-	context.strokeRect(0, 0, canvas.width, canvas.height);
-	context.restore();
-
-	$('#download').attr('href', canvas.toDataURL('image/png'));
+	//var pngData = canvas.toDataURL('image/png');
+	//var pngDownload = canvas.replace('image/png', 'image/octet-stream')
+	//$('#download').attr('href', pngDownload);
 };
 
 $(document).ready(function() {
-	var fetchTimeStamp = function() {
-		$.get('/timestamp', function(time) {
-			serverTimeStamp = time;
+	var checkModified = function() {
+		$.get('/modified/' + lastPrimitivesCount, function(modified) {
+			lastPrimitivesCount = modified;
 		});
 	};
 	
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
 		$.get('/board.json', function(board) {
-//			lastBoard = testBoard();
 			lastBoard = board;
 			paint();
 		});
 	};
 	
-	//window.setInterval(fetchTimeStamp, 1000);
+	//window.setInterval(checkModified, 1000);
 	window.setInterval(refreshBoard, 500);
 	paint();
 });

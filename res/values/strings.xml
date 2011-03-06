@@ -17,7 +17,7 @@
 	<string name="menu_stroke_width">Width</string>
 	<string name="menu_color">Color</string>
 	<string name="menu_clear">Clear</string>
-	<string name="menu_erase">Erase</string>
+	<string name="menu_eraser">Eraser</string>
 	
 	<string name="contextmenu_change_title">Change Title</string>
 	<string name="contextmenu_delete_whiteboard">Delete</string>

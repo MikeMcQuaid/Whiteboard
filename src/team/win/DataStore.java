@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataStore {
-	private LinkedList<Primitive> mPrimitiveList;
+	protected LinkedList<Primitive> mPrimitiveList;
 	private float mAspectRatio;
 
 	public DataStore() {

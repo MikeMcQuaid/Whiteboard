@@ -23,11 +23,9 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -92,6 +90,12 @@ public class WhiteBoardActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		// Use Action Bar in Honeycomb by applying Holo theme
+		Object holoThemeId = Utils.quietlyGetStaticField(android.R.style.class, "Theme_Holo");
+		if (holoThemeId != null) {
+			setTheme((Integer) holoThemeId);
+		}
+		
 		databaseHelper = new DatabaseHelper(this);
 		if (getIntent().hasExtra("ID")) {
 			whiteBoard = databaseHelper.getWhiteBoard(getIntent().getLongExtra("ID", -1));
@@ -105,8 +109,6 @@ public class WhiteBoardActivity extends Activity {
 		
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 		
@@ -121,8 +123,9 @@ public class WhiteBoardActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.whiteboard_menu, menu);
+		getMenuInflater().inflate(R.menu.whiteboard_menu, menu);
+		// Show menu options in Honeycomb action bar
+		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_eraser });
 		return true;
 	}
 
@@ -141,7 +144,7 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_color:
 			showDialog(COLOR_PICKER_DIALOG_ID);
 			return true;
-		case R.id.menu_erase:
+		case R.id.menu_eraser:
 			Toast.makeText(getApplicationContext(), "Implement me!", 3);
 			mWhiteBoardView.setPrimColor(Color.WHITE);
 			return true;
