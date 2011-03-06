@@ -60,8 +60,8 @@ public class WhiteBoardActivity extends Activity {
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"),
-		NORMAL(10, "Medium"),
-		THICK(15, "Thick"),
+		NORMAL(15, "Medium"),
+		THICK(25, "Thick"),
 		;
 		
 		static final String[] AS_STRINGS = new String[values().length];
@@ -113,8 +113,6 @@ public class WhiteBoardActivity extends Activity {
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 		mUndoManager.setContentView(mWhiteBoardView);
-
-
 	}
 	
 	private Intent makeServiceIntent() {
@@ -137,9 +135,9 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_save:
 			save();
 			return true;
-		case R.id.menu_load:
+		/*case R.id.menu_load:
 			//loadFromSdCard();
-			return true;
+			return true;*/
 		case R.id.menu_stroke_width:
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
