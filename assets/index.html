@@ -29,7 +29,7 @@ html, body {
 <a id="download" href="">Download</a>
 </div>
 <script>
-var serverTimeStamp = 0;
+var lastPrimitivesCount = 0;
 
 var num = 0;
 var testBoard = function() {
@@ -62,6 +62,8 @@ var paint = function() {
 		if (!primitive.points)
 			return false;
 
+		lastPrimitivesCount = primitive.points.length;
+
 		context.beginPath();
 		var lastX = 0;
 		var lastY = 0;
@@ -85,13 +87,15 @@ var paint = function() {
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 	context.restore();
 
-	$('#download').attr('href', canvas.toDataURL('image/png'));
+	//var pngData = canvas.toDataURL('image/png');
+	//var pngDownload = canvas.replace('image/png', 'image/octet-stream')
+	//$('#download').attr('href', pngDownload);
 };
 
 $(document).ready(function() {
-	var fetchTimeStamp = function() {
-		$.get('/timestamp', function(time) {
-			serverTimeStamp = time;
+	var checkModified = function() {
+		$.get('/modified/' + lastPrimitivesCount, function(modified) {
+			lastPrimitivesCount = modified;
 		});
 	};
 	
@@ -104,7 +108,7 @@ $(document).ready(function() {
 		});
 	};
 	
-	//window.setInterval(fetchTimeStamp, 1000);
+	//window.setInterval(checkModified, 1000);
 	window.setInterval(refreshBoard, 500);
 	paint();
 });

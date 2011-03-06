@@ -5,8 +5,8 @@ package team.win;
 
 public class WhiteBoard {
 
-	public int id = -1;
+	public long id = -1;
 	public String title;
-	public int lastModified;
+	public long lastModified;
 	
 }

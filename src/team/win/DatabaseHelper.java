@@ -86,11 +86,33 @@ public class DatabaseHelper {
 		return whiteBoards;
 	}
 	
+	public WhiteBoard getWhiteBoard(long id) {
+		checkConnectionOpen();
+		
+		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)}, null, null, null);
+		if (cursor.moveToNext()) {
+			WhiteBoard whiteBoard = new WhiteBoard();
+			whiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
+			whiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
+			whiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
+			return whiteBoard;
+		} else {
+			return null;
+		}
+	}
+	
 	public void addWhiteBoard(WhiteBoard whiteBoard) {
+		checkConnectionOpen();
+		
 		ContentValues content = new ContentValues();
 		content.put(WhiteBoardsTable.TITLE, whiteBoard.title);
 		content.put(WhiteBoardsTable.LAST_MODIFIED, whiteBoard.lastModified);
-		database.insert(WhiteBoardsTable.TABLE_NAME, null, content);
+		
+		if (whiteBoard.id < 0) {
+			whiteBoard.id = database.insert(WhiteBoardsTable.TABLE_NAME, null, content);
+		} else {
+			database.update(WhiteBoardsTable.TABLE_NAME, content, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(whiteBoard.id)});
+		}
 		
 		for (DatabaseHelper.Listener listener : listeners) {
 			listener.dataChanged();
