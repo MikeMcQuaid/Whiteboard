@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -69,40 +68,33 @@ public class WhiteBoardView extends View {
 	}
 
 	protected void onDraw(Canvas c) {
-		if (needsRedraw) {
+//		if (needsRedraw) {
 			// mDataStore.remove(mDataStore.size() - 1);
 			Paint temp = new Paint();
-			temp.setColor(Color.BLACK);
+			temp.setColor(Color.WHITE);
 			temp.setStyle(Paint.Style.FILL);
-			// c.clipRect(0,0,480, 800, Region.Op.REPLACE);
-			c.drawRect(0, 0, 480, 800, temp);
-		}
+			c.drawRect(0, 0, mWidth, mHeight, temp);
+//		}
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
-			Paint paint = new Paint();
-			paint.setAntiAlias(true);
-			paint.setDither(true);
-			paint.setStyle(Paint.Style.STROKE);
-			paint.setStrokeJoin(Paint.Join.ROUND);
-			paint.setStrokeCap(Paint.Cap.ROUND);
-			paint.setColor(Color.RED);
-			paint.setStrokeWidth(15);
-			Log.i("Loop", String.format("%d", paint.getColor()));
+			mPaint.setColor(p.mColor | 0xFF000000);
+			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth);
 			Path path = new Path();
 			Point[] points = p.mPoints.toArray(new Point[0]);
 			float pX, pY;
-			float lX = points[0].mX;
-			float lY = points[0].mY;
+			float lX = points[0].mX * mWidth;
+			float lY = points[0].mY * mHeight;
 			path.moveTo(lX, lY);
 			for (int i = 1; i < points.length - 1; i++) {
-				pX = points[i].mX;
-				pY = points[i].mY;
-				path.quadTo(lX, lY, (pX + lX) / 2, (pY + lY) / 2);
+				pX = points[i].mX * mWidth;
+				pY = points[i].mY * mHeight;
+				path.lineTo(pX, pY);
 				lX = pX;
 				lY = pX;
 			}
-			c.drawPath(path, paint);
+			c.drawPath(path, mPaint);
 		}
+
 		needsRedraw = false;
 	}
 

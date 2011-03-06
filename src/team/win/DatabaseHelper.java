@@ -119,6 +119,14 @@ public class DatabaseHelper {
 		}
 	}
 	
+	public void deleteWhiteBoard(long id) {
+		checkConnectionOpen();
+		database.delete(WhiteBoardsTable.TABLE_NAME, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)});
+		for (DatabaseHelper.Listener listener : listeners) {
+			listener.dataChanged();
+		}
+	}
+	
 	private static class OpenHelper extends SQLiteOpenHelper {
 
 		OpenHelper(Context context) {

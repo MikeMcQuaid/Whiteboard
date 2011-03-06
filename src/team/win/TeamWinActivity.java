@@ -6,26 +6,37 @@ package team.win;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class TeamWinActivity extends ListActivity implements DatabaseHelper.Listener {
 	
 	private static final String TAG = "TW_TeamWinActivity";
+	
+	private static final int ID_CONTEXTMENU_CHANGE_TITLE = 0;
+	private static final int ID_CONTEXTMENU_DELETE_WHITEBOARD = 1;
 	
 	private DatabaseHelper databaseHelper;
 	private WhiteBoardListAdapter listAdapter;
@@ -51,6 +62,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 				startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
 			}
 		});
+		
+		registerForContextMenu(findViewById(android.R.id.list));
 		
 		startService(makeServiceIntent());
 	}
@@ -84,6 +97,69 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position).id));
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		if (v.getId() == android.R.id.list) {
+			super.onCreateContextMenu(menu, v, menuInfo);
+			menu.setHeaderTitle(R.string.title_contextmenu_whiteboards);
+			menu.add(0, ID_CONTEXTMENU_CHANGE_TITLE, 0, R.string.contextmenu_change_title);
+			menu.add(0, ID_CONTEXTMENU_DELETE_WHITEBOARD, 1, R.string.contextmenu_delete_whiteboard);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case ID_CONTEXTMENU_CHANGE_TITLE:
+			final EditText inputField = new EditText(this);
+			final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+			final WhiteBoard currentWhiteBoard = existingWhiteBoards.get((int) info.id);
+			inputField.setText(currentWhiteBoard.title);
+			
+			new AlertDialog.Builder(this)
+				.setTitle(R.string.title_dialog_change_title)
+				.setView(inputField)
+				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						currentWhiteBoard.title = inputField.getText().toString();
+						databaseHelper.addWhiteBoard(currentWhiteBoard);
+						dialog.dismiss();
+					}
+				})
+				.setNeutralButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.show();
+			return true;
+		case ID_CONTEXTMENU_DELETE_WHITEBOARD:
+			new AlertDialog.Builder(this)
+				.setTitle(R.string.title_dialog_delete)
+				.setMessage(R.string.confirm_deleteWhiteBoard)
+				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id).id);
+						dialog.dismiss();
+					}
+				})
+				.setNeutralButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.show();
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
 	}
 
 	@Override
@@ -160,7 +236,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 			}
 			
 			String title = existingWhiteBoards.get(position).title;
-			String lastModifiedDateTime = String.valueOf(existingWhiteBoards.get(position).lastModified);
+			Date date = new Date(existingWhiteBoards.get(position).lastModified);
+			String lastModifiedDateTime = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
 			
 			((TextView) convertView.findViewById(R.id.title_whiteboard)).setText(title);
 			((TextView) convertView.findViewById(R.id.subtitle_whiteboard)).setText(lastModifiedDateTime);
