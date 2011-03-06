@@ -125,7 +125,7 @@ public class WhiteBoardActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.whiteboard_menu, menu);
 		// Show menu options in Honeycomb action bar
-		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_erase });
+		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_eraser });
 		return true;
 	}
 
@@ -144,7 +144,7 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_color:
 			showDialog(COLOR_PICKER_DIALOG_ID);
 			return true;
-		case R.id.menu_erase:
+		case R.id.menu_eraser:
 			Toast.makeText(getApplicationContext(), "Implement me!", 3);
 			mWhiteBoardView.setPrimColor(Color.WHITE);
 			return true;
