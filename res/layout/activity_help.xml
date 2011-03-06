@@ -2,8 +2,25 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+	android:layout_height="fill_parent" 
+	android:orientation="vertical"
+	android:gravity="center_horizontal">
 	
-	
+	<TextView 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:text="Made by TeamWin"
+		style="@android:style/TextAppearance.Large" />
+		
+	<TextView 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:text="Copyright 2011"
+		style="@android:style/TextAppearance.Small" />
+		
+	<TextView 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:text="Just point your browser at the web address given in the white board screen." />
 	
 </LinearLayout>
