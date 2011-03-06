@@ -170,7 +170,6 @@ public class WhiteBoardActivity extends Activity {
 					android.R.string.cancel,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
-							System.out.println("Phew");
 						}
 					})
 				.setNeutralButton(
