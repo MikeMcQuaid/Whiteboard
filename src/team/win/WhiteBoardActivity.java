@@ -53,6 +53,7 @@ public class WhiteBoardActivity extends Activity {
 		0xFFFF6800, Color.YELLOW, Color.LTGRAY, Color.GRAY, Color.WHITE, };
 
 	private DataStore mDataStore = new DataStore();
+	private UndoManager mUndoManager = new UndoManager();
 	private WhiteBoardView mWhiteBoardView;
 	private DatabaseHelper databaseHelper;
 	private WhiteBoard whiteBoard;
@@ -111,8 +112,9 @@ public class WhiteBoardActivity extends Activity {
 		setContentView(mWhiteBoardView);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
-		
-		
+		mUndoManager.setContentView(mWhiteBoardView);
+
+
 	}
 	
 	private Intent makeServiceIntent() {
@@ -147,6 +149,8 @@ public class WhiteBoardActivity extends Activity {
 			return true;
 		case R.id.menu_clear:
 			mWhiteBoardView.resetPoints();
+		case R.id.menu_undo:
+			mUndoManager.undo();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
