@@ -81,7 +81,7 @@ public class Utils {
 	/**
 	 * Returns the nicely formatted IP address.
 	 * 
-	 * @return for example: "Access at: http://1.2.3.4:8080/"
+	 * @return for example: "http://1.2.3.4:8080/"
 	 */
 	public static String getFormattedUrl(Resources resources) {
 		Enumeration<NetworkInterface> networkInterfaces;
