@@ -139,7 +139,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id).id);
+						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id - 1).id);
 						dialog.dismiss();
 					}
 				})
