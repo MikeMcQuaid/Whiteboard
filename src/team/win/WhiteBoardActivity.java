@@ -39,12 +39,25 @@ public class WhiteBoardActivity extends Activity {
 	private static final int STROKE_WIDTH_DIALOG_ID = 0;
 	private static final int COLOR_PICKER_DIALOG_ID = 1;
 	
+	private static final String TAG = "TW_WhiteBoardActivity";
+	
+	private static final String WHITEBOARD_DATA_FOLDER_PATH;
+	static {
+		StringBuffer whiteBoardFolderPath = new StringBuffer(Environment.getExternalStorageDirectory().getAbsolutePath());
+		whiteBoardFolderPath.append(File.separatorChar).append("Android").append(File.separatorChar).append("data").append(File.separatorChar)
+						  .append(WhiteBoardActivity.class.getPackage().getName())
+						  .append(File.separatorChar).append("whiteboards").append(File.separatorChar);
+		WHITEBOARD_DATA_FOLDER_PATH = whiteBoardFolderPath.toString();
+	}
+	
 	private static final Integer[] COLORS = { Color.BLACK, Color.DKGRAY,
 		Color.BLUE, Color.GREEN, Color.CYAN, Color.RED, Color.MAGENTA,
 		0xFFFF6800, Color.YELLOW, Color.LTGRAY, Color.GRAY, Color.WHITE, };
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
+	private DatabaseHelper databaseHelper;
+	private WhiteBoard whiteBoard;
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"),
@@ -78,17 +91,31 @@ public class WhiteBoardActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		databaseHelper = new DatabaseHelper(this);
+		if (getIntent().hasExtra("ID")) {
+			whiteBoard = databaseHelper.getWhiteBoard(getIntent().getLongExtra("ID", -1));
+			try {
+				loadFromSdCard();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
+		
+		
 	}
 	
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
-		intent.setClass(this, HttpService.class);
+		intent.setClass(getApplicationContext(), HttpService.class);
 		return intent;
 	}
 
@@ -103,10 +130,10 @@ public class WhiteBoardActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			saveToSdcard();
+			save();
 			return true;
 		case R.id.menu_load:
-			loadFromSdcard();
+			//loadFromSdCard();
 			return true;
 		case R.id.menu_stroke_width:
 			showDialog(STROKE_WIDTH_DIALOG_ID);
@@ -183,65 +210,87 @@ public class WhiteBoardActivity extends Activity {
 			Log.w("teamwin", "Service disconnected");
 		}
 	};
+	
+	private void save() {
+		try {
+			// If this is the first save then we need to create the database entry before saving the 
+			// data file as we need the white board id to create the data file.
+			if (whiteBoard == null) {
+				whiteBoard = new WhiteBoard();
+				whiteBoard.title = getResources().getString(R.string.label_defaultWhiteBoardTitle);
+				databaseHelper.addWhiteBoard(whiteBoard);
+			}
+			
+			saveToSdCard();
+		} catch (IOException e) {
+			new AlertDialog.Builder(this)
+				.setCancelable(false)
+				.setMessage(e.getMessage())
+				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		}
+	}
 
-	private boolean saveToSdcard() {
-		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			System.out.println("External storage not available");
-			return false;
+	private String saveToSdCard() throws IOException {
+		// Is the SD card available.
+		// Note: if it isn't available then the device might be connected to a PC
+		// with the SD card mounted.
+		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			throw new IOException(getResources().getString(R.string.error_noExternalStorage));
 		}
 
-		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath(); 
-		File createDirs[] = {
-			new File(baseDir + "/Android"),
-			new File(baseDir + "/Android/data"),
-			new File(baseDir + "/Android/data/" + getClass().getPackage().getName()),
-			new File(baseDir + "/Android/data/" + getClass().getPackage().getName() + "/files")
-		};
-
-		for (File createDir : createDirs) {
-			if(!createDir.exists()) {
-				if(!createDir.mkdir()) {
-					System.out.println("Couldn't mkdir " + createDir.getAbsolutePath());
-					return false;
-				}
+		StringBuffer whiteBoardFilePath = new StringBuffer(WHITEBOARD_DATA_FOLDER_PATH);
+		whiteBoardFilePath.append(whiteBoard.id).append(".dat");
+		
+		// Create the white board file if it doesn't exist.
+		File whiteBoardFile = new File(whiteBoardFilePath.toString());
+		if (!whiteBoardFile.exists()) {
+			// Make sure the path to the file exists.
+			new File(WHITEBOARD_DATA_FOLDER_PATH).mkdirs();
+			
+			if (!whiteBoardFile.createNewFile()) {
+				Log.e(TAG, "Failed to create new white board data file. " + whiteBoardFilePath.toString());
+				throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 			}
 		}
-
-		File file = new File(createDirs[createDirs.length - 1], "save.dat");
+		
+		// Serialise the white board to the file.
 		try {
-			mDataStore.serializeDataStore(new FileOutputStream(file));
+			mDataStore.serializeDataStore(new FileOutputStream(whiteBoardFile));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
+			Log.e(TAG, "Failed to write white board data file. " + e.getMessage());
+			throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			Log.e(TAG, "Failed to write white board data file. " + e.getMessage());
+			throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 		}
-
-		return true;
+		return whiteBoardFile.getAbsolutePath();
 	}
 	
-	private boolean loadFromSdcard() {
-		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			System.out.println("External storage not available");
-			return false;
+	private void loadFromSdCard() throws IOException {
+		// Is the SD card available.
+		// Note: if it isn't available then the device might be connected to a PC
+		// with the SD card mounted.
+		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			throw new IOException(getResources().getString(R.string.error_noExternalStorage));
 		}
 
-		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-		File file = new File(baseDir + "/Android/data/" + getClass().getPackage().getName() + "/files", "save.dat");
+		StringBuffer whiteBoardFilePath = new StringBuffer(WHITEBOARD_DATA_FOLDER_PATH);
+		whiteBoardFilePath.append(whiteBoard.id).append(".dat");
+		
 		try {
-			mDataStore.deserializeDataStore(new FileInputStream(file));
+			mDataStore.deserializeDataStore(new FileInputStream(new File(whiteBoardFilePath.toString())));
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not load save file");
 			e.printStackTrace();
-			return false;
 		} catch (IOException e) {
 			System.out.println("I/O error loading save file");
 			e.printStackTrace();
-			return false;
 		}
-
-		return true;
 	}
 
 }
