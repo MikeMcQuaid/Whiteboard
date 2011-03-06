@@ -7,8 +7,11 @@
 	<style name="header_appname" parent="@android:style/TextAppearance.Large">
 		
 	</style>
-	<style name="header_remoteurl" parent="@android:style/TextAppearance.Small">
-		<item name="android:textSize">12sp</item>
+	<style name="header_remoteurl_intro" parent="@android:style/TextAppearance.Small">
+		<item name="android:textSize">15sp</item>
+	</style>
+	<style name="header_remoteurl" parent="@android:style/TextAppearance.Large">
+		
 	</style>
 	<style name="listitem_whiteboard">
 		<item name="android:padding">5dp</item>
