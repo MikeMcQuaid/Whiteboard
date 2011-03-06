@@ -106,7 +106,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		case ID_CONTEXTMENU_CHANGE_TITLE:
 			final EditText inputField = new EditText(this);
 			final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-			final WhiteBoard currentWhiteBoard = existingWhiteBoards.get((int) info.id);
+			final WhiteBoard currentWhiteBoard = existingWhiteBoards.get((int) info.id - 1);
 			inputField.setText(currentWhiteBoard.title);
 			
 			new AlertDialog.Builder(this)
