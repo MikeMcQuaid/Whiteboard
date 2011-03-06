@@ -126,18 +126,26 @@ var paint = function() {
 		lastPrimitivesCount = primitive.points.length;
 
 		context.beginPath();
-		var lastX = 0;
-		var lastY = 0;
-		for (var point = 0; point < primitive.points.length; point+=2) {
-			// Second transformation for line width differences on Android.
-			var x = primitive.points[point] * board.aspectRatio;
-			var y = primitive.points[point+1];
-			if (lastX && lastY)
-				context.quadraticCurveTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
-			else
-				context.moveTo(x, y);
-			lastX = x;
-			lastY = y;
+		if (primitive.points.length > 2) {
+			var lastX = 0;
+			var lastY = 0;
+			for (var point = 0; point < primitive.points.length; point+=2) {
+				// Second transformation for line width differences on Android.
+				var x = primitive.points[point] * board.aspectRatio;
+				var y = primitive.points[point+1];
+				if (lastX && lastY)
+					context.quadraticCurveTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+				else
+					context.moveTo(x, y);
+				lastX = x;
+				lastY = y;
+			}
+		}
+		else {
+			var x = primitive.points[0] * board.aspectRatio;
+			var y = primitive.points[1];
+			context.moveTo(x, y);
+			context.lineTo(x, y);
 		}
 		context.lineWidth = primitive.strokeWidth;
 		context.strokeStyle = '#' + primitive.color;
