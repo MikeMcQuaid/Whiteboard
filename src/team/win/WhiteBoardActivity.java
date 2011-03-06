@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,7 +113,13 @@ public class WhiteBoardActivity extends Activity {
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 	}
-	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		showFormattedUrl();
+	}
+
 	private Intent makeServiceIntent() {
 		Intent intent = new Intent();
 		intent.setClass(getApplicationContext(), HttpService.class);
@@ -125,6 +132,18 @@ public class WhiteBoardActivity extends Activity {
 		// Show menu options in Honeycomb action bar
 		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_eraser });
 		return true;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		showFormattedUrl();
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	private void showFormattedUrl() {
+		Toast toast = Toast.makeText(this, Utils.getFormattedUrl(getResources()), 3);
+		toast.setGravity(Gravity.TOP, 0, 0);
+		toast.show();
 	}
 
 	@Override

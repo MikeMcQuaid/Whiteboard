@@ -3,11 +3,7 @@
  */
 package team.win;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -16,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -182,24 +177,9 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	 */
 	private void displayRemoteUrl() {
 		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
-		String remoteUrlFormat = getResources().getString(R.string.label_remoteurl);
-		
-		try {
-			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
-				NetworkInterface networkInterface = networkInterfaces.nextElement();
-				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
-					InetAddress inetAddress = inetAddresses.nextElement();
-					if (!inetAddress.isLoopbackAddress()) {
-						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString(), HttpService.PORT_NUMBER));
-					}
-				}
-			}
-		} catch (SocketException e) {
-			Log.e(TAG, e.getMessage());
-			remoteUrlTextView.setText(getResources().getString(R.string.error_remoteurl));
-		}
+		remoteUrlTextView.setText(Utils.getFormattedUrl(getResources()));
 	}
-	
+
 	@Override
 	public void dataChanged() {
 		existingWhiteBoards = databaseHelper.getWhiteBoards();
