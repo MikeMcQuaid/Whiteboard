@@ -23,11 +23,9 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -78,10 +76,15 @@ public class WhiteBoardActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Use Action Bar in Honeycomb by applying Holo theme
+		Object holoThemeId = Utils.quietlyGetStaticField(android.R.style.class, "Theme_Holo");
+		if (holoThemeId != null) {
+			setTheme((Integer) holoThemeId);
+		}
+		
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
 	}

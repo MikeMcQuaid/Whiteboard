@@ -38,6 +38,14 @@ public class Utils {
 		}
 	}
 	
+	public static Object quietlyGetStaticField(Class<?> clazz, String name) {
+		try {
+			return clazz.getField(name).get(null);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
 	/**
 	 * Requests that the specified menu items be showed in the Honeycomb Action Bar.
 	 * 
