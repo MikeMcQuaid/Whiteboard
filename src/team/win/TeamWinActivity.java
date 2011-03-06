@@ -69,6 +69,13 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		existingWhiteBoards = databaseHelper.getWhiteBoards();
+		dataChanged();
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater menuInflater = getMenuInflater();
 		menuInflater.inflate(R.menu.main_menu, menu);
