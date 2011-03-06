@@ -35,7 +35,7 @@ import android.widget.Toast;
 
 public class WhiteBoardActivity extends Activity {
 	
-	private static final String TAG = Utils.buildLogTag(WhiteBoardActivity.class);
+	static final String TAG = Utils.buildLogTag(WhiteBoardActivity.class);
 
 	private static final int STROKE_WIDTH_DIALOG_ID = 0;
 	private static final int COLOR_PICKER_DIALOG_ID = 1;
@@ -235,13 +235,16 @@ public class WhiteBoardActivity extends Activity {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.w(TAG, "Service connected");
 			mWhiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
+			
+			Toast toast = Toast.makeText(WhiteBoardActivity.this, Utils.getFormattedUrl(getResources()), 3);
+			toast.setGravity(Gravity.TOP, 0, 0);
+			toast.show();
 		}
-		
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			Log.w(TAG, "Service disconnected");
+			Toast.makeText(WhiteBoardActivity.this, R.string.label_stopping_whiteboard, 3).show();
 		}
 	};
 	

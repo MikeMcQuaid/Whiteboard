@@ -45,7 +45,6 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		displayRemoteUrl();
 		
 		databaseHelper = new DatabaseHelper(this);
 		existingWhiteBoards = databaseHelper.getWhiteBoards();
@@ -57,11 +56,14 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	}
 
 	private final ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override public void onServiceDisconnected(ComponentName name) {
-			// TODO Could update the UI here
-		}
 		@Override public void onServiceConnected(ComponentName name, IBinder service) {
-			// TODO Could update the UI here
+			TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
+			remoteUrlTextView.setText(Utils.getFormattedUrl(getResources()));
+			
+		}
+		@Override public void onServiceDisconnected(ComponentName name) {
+			TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
+			remoteUrlTextView.setText(R.string.label_stopping_whiteboard);
 		}
 	};
 

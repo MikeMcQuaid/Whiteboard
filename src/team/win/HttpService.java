@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Gravity;
 import android.widget.Toast;
 
 public class HttpService extends Service {
@@ -56,9 +55,6 @@ public class HttpService extends Service {
 		try {
 			server.start();
 			Log.i(TAG, "Started server");
-			Toast toast = Toast.makeText(this, Utils.getFormattedUrl(getResources()), 3);
-			toast.setGravity(Gravity.TOP, 0, 0);
-			toast.show();
 		} catch (Exception e) {
 			Log.w(TAG, "Unable to start server", e);
 			Toast.makeText(this, "Unable to start server: " + e.getMessage(), 3).show();
@@ -75,7 +71,6 @@ public class HttpService extends Service {
 			Toast.makeText(this, R.string.label_stopping_whiteboard, 3).show();
 		} catch (Exception e) {
 			Log.w(TAG, "Unable to stop server", e);
-			Toast.makeText(this, "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
 
