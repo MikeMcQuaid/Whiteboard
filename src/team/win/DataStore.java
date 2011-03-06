@@ -46,7 +46,7 @@ public class DataStore {
 					pointArray.put(point.mY);
 				}
 				JSONObject primObject = new JSONObject();
-				primObject.put("color", Integer.toHexString(primitive.mColor));
+				primObject.put("color", String.format("%06x", primitive.mColor));
 				primObject.put("strokeWidth", primitive.mStrokeWidth);
 				primObject.put("points", pointArray);
 				primitives.put(primObject);

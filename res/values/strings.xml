@@ -5,13 +5,22 @@
 	
 	<!-- Labels for menu items, buttons etc. -->
 	<string name="label_remoteurl">Access at: http:/%1$s:%2$s</string>
+	<string name="label_defaultWhiteBoardTitle">Untitled</string>
+	
 	<string name="menu_shutdown">Shutdown</string>
 	<string name="menu_save">Save</string>
 	<string name="menu_load">Load</string>
 	<string name="menu_stroke_width">Width</string>
 	<string name="menu_color">Color</string>
+	<string name="menu_clear">Clear</string>
+	<string name="menu_erase">Erase</string>
+	
+	<string name="button_ok">Ok</string>
 	
 	<!-- Info, confirmation and error messages. -->
 	<string name="error_remoteurl">Error getting remote URL</string>
+	<string name="error_noExternalStorage">External storage is not available.</string>
+	<string name="error_savingWhiteBoard">Failed to save the white board.</string>
+	
 	<string name="message_nowhiteboards">No saved whiteboards</string>
 </resources>

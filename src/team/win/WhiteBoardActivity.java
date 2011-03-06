@@ -23,16 +23,39 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.WindowManager;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.Toast;
 
-public class WhiteBoardActivity extends Activity implements ColorPickerDialog.OnColorChangedListener {
+public class WhiteBoardActivity extends Activity {
 	
-	private static final int STROKE_WIDTH_DIALOG_ID = 1;
+	private static final int STROKE_WIDTH_DIALOG_ID = 0;
+	private static final int COLOR_PICKER_DIALOG_ID = 1;
+	
+	private static final String TAG = "TW_WhiteBoardActivity";
+	
+	private static final String WHITEBOARD_DATA_FOLDER_PATH;
+	static {
+		StringBuffer whiteBoardFolderPath = new StringBuffer(Environment.getExternalStorageDirectory().getAbsolutePath());
+		whiteBoardFolderPath.append(File.separatorChar).append("Android").append(File.separatorChar).append("data").append(File.separatorChar)
+						  .append(WhiteBoardActivity.class.getPackage().getName())
+						  .append(File.separatorChar).append("whiteboards").append(File.separatorChar);
+		WHITEBOARD_DATA_FOLDER_PATH = whiteBoardFolderPath.toString();
+	}
+	
+	private static final Integer[] COLORS = { Color.BLACK, Color.DKGRAY,
+		Color.BLUE, Color.GREEN, Color.CYAN, Color.RED, Color.MAGENTA,
+		0xFFFF6800, Color.YELLOW, Color.LTGRAY, Color.GRAY, Color.WHITE, };
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
+	private DatabaseHelper databaseHelper;
+	private WhiteBoard whiteBoard;
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"),
@@ -66,12 +89,30 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Use Action Bar in Honeycomb by applying Holo theme
+		Object holoThemeId = Utils.quietlyGetStaticField(android.R.style.class, "Theme_Holo");
+		if (holoThemeId != null) {
+			setTheme((Integer) holoThemeId);
+		}
+		
+		databaseHelper = new DatabaseHelper(this);
+		if (getIntent().hasExtra("ID")) {
+			whiteBoard = databaseHelper.getWhiteBoard(getIntent().getLongExtra("ID", -1));
+			try {
+				loadFromSdCard();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		mWhiteBoardView = new WhiteBoardView(this, mDataStore, mLastWidth.mWidth, Color.RED);
 		setContentView(mWhiteBoardView);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
+		
+		
 	}
 	
 	private Intent makeServiceIntent() {
@@ -82,8 +123,9 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.whiteboard_menu, menu);
+		getMenuInflater().inflate(R.menu.whiteboard_menu, menu);
+		// Show menu options in Honeycomb action bar
+		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_erase });
 		return true;
 	}
 
@@ -91,21 +133,23 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			saveToSdcard();
+			save();
 			return true;
 		case R.id.menu_load:
-			loadFromSdcard();
+			//loadFromSdCard();
 			return true;
 		case R.id.menu_stroke_width:
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
 		case R.id.menu_color:
-			new ColorPickerDialog(this, this, 255).show();
-			/*mWhiteBoardView.setPrimColor(
-				Color.argb(255,
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255),
-						   mRandomSource.nextInt(255)));*/
+			showDialog(COLOR_PICKER_DIALOG_ID);
+			return true;
+		case R.id.menu_erase:
+			Toast.makeText(getApplicationContext(), "Implement me!", 3);
+			mWhiteBoardView.setPrimColor(Color.WHITE);
+			return true;
+		case R.id.menu_clear:
+			mWhiteBoardView.resetPoints();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -128,6 +172,30 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 				}
 			});
 			return builder.create();
+		case COLOR_PICKER_DIALOG_ID:
+			final Dialog dialog = new Dialog(this);
+			dialog.setTitle("Choose colour");
+			dialog.setContentView(R.layout.color_picker);
+			GridView gridView = (GridView) dialog.findViewById(R.id.color_picker_gridview);
+			gridView.setAdapter(new ArrayAdapter<Integer>(this, 0, COLORS) {
+				@Override
+				public View getView(int position, View convertView, ViewGroup parent) {
+					final int color = COLORS[position];
+					View colorView = new View(WhiteBoardActivity.this);
+					colorView.setMinimumWidth(45);
+					colorView.setMinimumHeight(45);
+					colorView.setBackgroundColor(color);
+					return colorView;
+				}
+			});
+			gridView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+					mWhiteBoardView.setPrimColor(COLORS[position]);
+					dialog.dismiss();
+				}
+			});
+			return dialog;
 		default:
 			return super.onCreateDialog(id);
 		}
@@ -145,69 +213,87 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 			Log.w("teamwin", "Service disconnected");
 		}
 	};
+	
+	private void save() {
+		try {
+			// If this is the first save then we need to create the database entry before saving the 
+			// data file as we need the white board id to create the data file.
+			if (whiteBoard == null) {
+				whiteBoard = new WhiteBoard();
+				whiteBoard.title = getResources().getString(R.string.label_defaultWhiteBoardTitle);
+				databaseHelper.addWhiteBoard(whiteBoard);
+			}
+			
+			saveToSdCard();
+		} catch (IOException e) {
+			new AlertDialog.Builder(this)
+				.setCancelable(false)
+				.setMessage(e.getMessage())
+				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		}
+	}
 
-	private boolean saveToSdcard() {
-		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			System.out.println("External storage not available");
-			return false;
+	private String saveToSdCard() throws IOException {
+		// Is the SD card available.
+		// Note: if it isn't available then the device might be connected to a PC
+		// with the SD card mounted.
+		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			throw new IOException(getResources().getString(R.string.error_noExternalStorage));
 		}
 
-		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath(); 
-		File createDirs[] = {
-			new File(baseDir + "/Android"),
-			new File(baseDir + "/Android/data"),
-			new File(baseDir + "/Android/data/" + getClass().getPackage().getName()),
-			new File(baseDir + "/Android/data/" + getClass().getPackage().getName() + "/files")
-		};
-
-		for (File createDir : createDirs) {
-			if(!createDir.exists()) {
-				if(!createDir.mkdir()) {
-					System.out.println("Couldn't mkdir " + createDir.getAbsolutePath());
-					return false;
-				}
+		StringBuffer whiteBoardFilePath = new StringBuffer(WHITEBOARD_DATA_FOLDER_PATH);
+		whiteBoardFilePath.append(whiteBoard.id).append(".dat");
+		
+		// Create the white board file if it doesn't exist.
+		File whiteBoardFile = new File(whiteBoardFilePath.toString());
+		if (!whiteBoardFile.exists()) {
+			// Make sure the path to the file exists.
+			new File(WHITEBOARD_DATA_FOLDER_PATH).mkdirs();
+			
+			if (!whiteBoardFile.createNewFile()) {
+				Log.e(TAG, "Failed to create new white board data file. " + whiteBoardFilePath.toString());
+				throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 			}
 		}
-
-		File file = new File(createDirs[createDirs.length - 1], "save.dat");
+		
+		// Serialise the white board to the file.
 		try {
-			mDataStore.serializeDataStore(new FileOutputStream(file));
+			mDataStore.serializeDataStore(new FileOutputStream(whiteBoardFile));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
+			Log.e(TAG, "Failed to write white board data file. " + e.getMessage());
+			throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			Log.e(TAG, "Failed to write white board data file. " + e.getMessage());
+			throw new IOException(getResources().getString(R.string.error_savingWhiteBoard));
 		}
-
-		return true;
+		return whiteBoardFile.getAbsolutePath();
 	}
 	
-	private boolean loadFromSdcard() {
-		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			System.out.println("External storage not available");
-			return false;
+	private void loadFromSdCard() throws IOException {
+		// Is the SD card available.
+		// Note: if it isn't available then the device might be connected to a PC
+		// with the SD card mounted.
+		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			throw new IOException(getResources().getString(R.string.error_noExternalStorage));
 		}
 
-		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-		File file = new File(baseDir + "/Android/data/" + getClass().getPackage().getName() + "/files", "save.dat");
+		StringBuffer whiteBoardFilePath = new StringBuffer(WHITEBOARD_DATA_FOLDER_PATH);
+		whiteBoardFilePath.append(whiteBoard.id).append(".dat");
+		
 		try {
-			mDataStore.deserializeDataStore(new FileInputStream(file));
+			mDataStore.deserializeDataStore(new FileInputStream(new File(whiteBoardFilePath.toString())));
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not load save file");
 			e.printStackTrace();
-			return false;
 		} catch (IOException e) {
 			System.out.println("I/O error loading save file");
 			e.printStackTrace();
-			return false;
 		}
-
-		return true;
 	}
 
-	@Override
-	public void colorChanged(int color) {
-		mWhiteBoardView.setPrimColor(color);
-	}
 }
