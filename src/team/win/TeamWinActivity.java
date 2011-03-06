@@ -3,11 +3,7 @@
  */
 package team.win;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -16,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -55,14 +50,6 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		listAdapter = new WhiteBoardListAdapter();
 		setListAdapter(listAdapter);
 		
-		final Button addWhiteboardButton = (Button) findViewById(R.id.button_add_whiteboard);
-		addWhiteboardButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
-			}
-		});
-		
 		registerForContextMenu(findViewById(android.R.id.list));
 		
 		startService(makeServiceIntent());
@@ -99,12 +86,16 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position).id));
+		if (position == 0) {
+			startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
+		} else {
+			startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position - 1).id));
+		}
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		if (v.getId() == android.R.id.list) {
+		if (v.getId() == android.R.id.list && ((AdapterContextMenuInfo) menuInfo).id > 0) {
 			super.onCreateContextMenu(menu, v, menuInfo);
 			menu.setHeaderTitle(R.string.title_contextmenu_whiteboards);
 			menu.add(0, ID_CONTEXTMENU_CHANGE_TITLE, 0, R.string.contextmenu_change_title);
@@ -186,24 +177,9 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	 */
 	private void displayRemoteUrl() {
 		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
-		String remoteUrlFormat = getResources().getString(R.string.label_remoteurl);
-		
-		try {
-			for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
-				NetworkInterface networkInterface = networkInterfaces.nextElement();
-				for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
-					InetAddress inetAddress = inetAddresses.nextElement();
-					if (!inetAddress.isLoopbackAddress()) {
-						remoteUrlTextView.setText(String.format(remoteUrlFormat, inetAddress.toString(), HttpService.PORT_NUMBER));
-					}
-				}
-			}
-		} catch (SocketException e) {
-			Log.e(TAG, e.getMessage());
-			remoteUrlTextView.setText(getResources().getString(R.string.error_remoteurl));
-		}
+		remoteUrlTextView.setText(Utils.getFormattedUrl(getResources()));
 	}
-	
+
 	@Override
 	public void dataChanged() {
 		existingWhiteBoards = databaseHelper.getWhiteBoards();
@@ -219,12 +195,16 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 
 		@Override
 		public int getCount() {
-			return existingWhiteBoards.size();
+			return existingWhiteBoards.size() + 1;
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return existingWhiteBoards.get(position);
+			if (position == 0) {
+				return null;
+			} else {
+				return existingWhiteBoards.get(position - 1);
+			}
 		}
 
 		@Override
@@ -238,12 +218,19 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 				convertView = getLayoutInflater().inflate(R.layout.listitem_whiteboard, null);
 			}
 			
-			String title = existingWhiteBoards.get(position).title;
-			Date date = new Date(existingWhiteBoards.get(position).lastModified);
-			String lastModifiedDateTime = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
+			String title;
+			String subtitle;
+			if (position == 0) {
+				title = getResources().getString(R.string.label_createWhiteBoard);
+				subtitle = "Starts a new white board session";
+			} else {
+				title = existingWhiteBoards.get(position - 1).title;
+				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified * 1000L);
+				subtitle = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
+			}
 			
 			((TextView) convertView.findViewById(R.id.title_whiteboard)).setText(title);
-			((TextView) convertView.findViewById(R.id.subtitle_whiteboard)).setText(lastModifiedDateTime);
+			((TextView) convertView.findViewById(R.id.subtitle_whiteboard)).setText(subtitle);
 			
 			return convertView;
 		}

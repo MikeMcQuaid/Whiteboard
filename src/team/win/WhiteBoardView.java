@@ -122,12 +122,18 @@ public class WhiteBoardView extends View {
 	}
 
 	private void touchStart(float x, float y) {
+		// WTF?
+		if(x < 0.0 || y < 0.0 || x > mWidth || y > mHeight)
+			return;
 		resetPoints();
 		mPoints.add(new Point(x / mWidth, y / mHeight));
 		mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
 	}
 
 	private void touchMove(float x, float y) {
+		// WTF?
+		if(x < 0.0 || y < 0.0 || x > mWidth || y > mHeight)
+			return;
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
