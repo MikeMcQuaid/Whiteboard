@@ -25,8 +25,6 @@ public class WhiteBoardView extends View {
 	private float mStrokeWidth;
 	private float mX, mY;
 	private int mColor;
-	
-	private boolean needsRedraw;
 
 	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
@@ -55,26 +53,26 @@ public class WhiteBoardView extends View {
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 	}
 
+	private void resetPoints() {
+		mPoints = new LinkedList<Point>();
+	}
+
 	public void setHttpService(HttpService httpService) {
 		this.mHttpService = httpService;
 	}
 	
-	public void setNeedsRedraw() {
+	public void undo() {
 		if (mDataStore.size() <= 0)
 			return;
-		needsRedraw = true;
 		mDataStore.remove(mDataStore.size() - 1);
 		invalidate();
 	}
 
 	protected void onDraw(Canvas c) {
-//		if (needsRedraw) {
-			// mDataStore.remove(mDataStore.size() - 1);
-			Paint temp = new Paint();
-			temp.setColor(Color.WHITE);
-			temp.setStyle(Paint.Style.FILL);
-			c.drawRect(0, 0, mWidth, mHeight, temp);
-//		}
+		Paint temp = new Paint();
+		temp.setColor(Color.WHITE);
+		temp.setStyle(Paint.Style.FILL);
+		c.drawRect(0, 0, mWidth, mHeight, temp);
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
 			mPaint.setColor(p.mColor | 0xFF000000);
@@ -94,8 +92,6 @@ public class WhiteBoardView extends View {
 			}
 			c.drawPath(path, mPaint);
 		}
-
-		needsRedraw = false;
 	}
 
 	@Override
@@ -124,7 +120,7 @@ public class WhiteBoardView extends View {
 		}
 		return true;
 	}
-	
+
 	private void touchStart(float x, float y) {
 		resetPoints();
 		mPoints.add(new Point(x / mWidth, y / mHeight));
@@ -132,7 +128,6 @@ public class WhiteBoardView extends View {
 	}
 
 	private void touchMove(float x, float y) {
-
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
@@ -145,10 +140,6 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
-	}
-
-	public void resetPoints() {
-		mPoints = new LinkedList<Point>();
 	}
 
 	protected void setPrimColor(int c) {

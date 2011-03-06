@@ -26,7 +26,7 @@ html, body {
 </div>
 
 <div>
-<a id="download" href="">Download</a>
+<a id="download" href="">Download as a PNG image</a>
 </div>
 <script>
 var lastPrimitivesCount = 0;
@@ -72,9 +72,10 @@ var paint = function() {
 	});
 	context.restore();
 
-	//var pngData = canvas.toDataURL('image/png');
-	//var pngDownload = canvas.replace('image/png', 'image/octet-stream')
-	//$('#download').attr('href', pngDownload);
+	var pngMime = 'image/png';
+	var pngData = canvas.toDataURL(pngMime);
+	var pngDownload = canvas.replace(pngMime, 'image/octet-stream')
+	$('#download').attr('href', pngDownload);
 };
 
 $(document).ready(function() {
