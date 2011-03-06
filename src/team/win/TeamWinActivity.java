@@ -221,8 +221,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 			String title;
 			String subtitle;
 			if (position == 0) {
-				title = "Create White Board";
-				subtitle = "";
+				title = getResources().getString(R.string.label_createWhiteBoard);
+				subtitle = "Starts a new white board session";
 			} else {
 				title = existingWhiteBoards.get(position - 1).title;
 				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified);

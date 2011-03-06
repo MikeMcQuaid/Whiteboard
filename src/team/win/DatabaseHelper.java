@@ -82,6 +82,7 @@ public class DatabaseHelper {
 			nextWhiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
 			whiteBoards.add(nextWhiteBoard);
 		}
+		cursor.close();
 		
 		return whiteBoards;
 	}
@@ -90,14 +91,18 @@ public class DatabaseHelper {
 		checkConnectionOpen();
 		
 		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)}, null, null, null);
-		if (cursor.moveToNext()) {
-			WhiteBoard whiteBoard = new WhiteBoard();
-			whiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
-			whiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
-			whiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
-			return whiteBoard;
-		} else {
-			return null;
+		try {
+			if (cursor.moveToNext()) {
+				WhiteBoard whiteBoard = new WhiteBoard();
+				whiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
+				whiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
+				whiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
+				return whiteBoard;
+			} else {
+				return null;
+			}
+		} finally {
+			cursor.close();
 		}
 	}
 	

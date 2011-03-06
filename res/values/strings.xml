@@ -9,6 +9,7 @@
 	<string name="title_dialog_delete">Delete</string>
 	
 	<string name="label_remoteurl">Access at: http:/%1$s:%2$s</string>
+	<string name="label_createWhiteBoard">Create White Board</string>
 	<string name="label_defaultWhiteBoardTitle">Untitled</string>
 	
 	<string name="menu_shutdown">Shutdown</string>
