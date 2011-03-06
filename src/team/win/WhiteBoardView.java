@@ -19,7 +19,6 @@ public class WhiteBoardView extends View {
 	private final DataStore mDataStore;
 	
 	private List<Point> mPoints;
-	private HttpService mHttpService;
 
 	private float mWidth, mHeight;
 	private float mStrokeWidth;
@@ -56,10 +55,6 @@ public class WhiteBoardView extends View {
 	private void resetPoints() {
 		mPoints = new LinkedList<Point>();
 	}
-
-	public void setHttpService(HttpService httpService) {
-		this.mHttpService = httpService;
-	}
 	
 	public void undo() {
 		if (mDataStore.size() <= 0)
@@ -77,20 +72,24 @@ public class WhiteBoardView extends View {
 		for (Primitive p : mDataStore.mPrimitiveList) {
 			mPaint.setColor(p.mColor | 0xFF000000);
 			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth);
-			Path path = new Path();
-			Point[] points = p.mPoints.toArray(new Point[0]);
-			float pX, pY;
-			float lX = points[0].mX * mWidth;
-			float lY = points[0].mY * mHeight;
-			path.moveTo(lX, lY);
-			for (int i = 1; i < points.length - 1; i++) {
-				pX = points[i].mX * mWidth;
-				pY = points[i].mY * mHeight;
-				path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
-				lX = pX;
-				lY = pY;
+			if (p.mPoints.size() > 1) {
+				Path path = new Path();
+				float pX, pY;
+				float lX = p.mPoints.get(0).mX * mWidth;
+				float lY = p.mPoints.get(0).mY * mHeight;
+				path.moveTo(lX, lY);
+				for (int i = 1; i < p.mPoints.size() - 1; i++) {
+					pX = p.mPoints.get(i).mX * mWidth;
+					pY = p.mPoints.get(i).mY * mHeight;
+					path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
+					lX = pX;
+					lY = pY;
+				}
+				c.drawPath(path, mPaint);
+			} else {
+				c.drawPoint(p.mPoints.get(0).mX * mWidth,
+							p.mPoints.get(0).mY * mHeight, mPaint);
 			}
-			c.drawPath(path, mPaint);
 		}
 	}
 
@@ -140,9 +139,6 @@ public class WhiteBoardView extends View {
 			mPoints.add(new Point(x / mWidth, y / mHeight));
 			mDataStore.remove(mDataStore.size() - 1);
 			mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
-			if (mHttpService != null) {
-				mHttpService.setDataStore(mDataStore);
-			}
 			mX = x;
 			mY = y;
 		}
