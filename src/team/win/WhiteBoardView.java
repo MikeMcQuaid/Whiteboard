@@ -53,6 +53,10 @@ public class WhiteBoardView extends View {
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 	}
 
+	private void resetPoints() {
+		mPoints = new LinkedList<Point>();
+	}
+
 	public void setHttpService(HttpService httpService) {
 		this.mHttpService = httpService;
 	}
@@ -116,7 +120,7 @@ public class WhiteBoardView extends View {
 		}
 		return true;
 	}
-	
+
 	private void touchStart(float x, float y) {
 		resetPoints();
 		mPoints.add(new Point(x / mWidth, y / mHeight));
@@ -124,7 +128,6 @@ public class WhiteBoardView extends View {
 	}
 
 	private void touchMove(float x, float y) {
-
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
@@ -137,10 +140,6 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
-	}
-
-	public void resetPoints() {
-		mPoints = new LinkedList<Point>();
 	}
 
 	protected void setPrimColor(int c) {
