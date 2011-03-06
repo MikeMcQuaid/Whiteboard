@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Hello canvas</title>
+<title>Wifi Whiteboard by Team Win</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 <style>
 html, body {
@@ -11,23 +11,41 @@ html, body {
 	padding: 0;
 }
 
+h1 {
+	display:inline;
+}
+
+#download {
+	text-align: right;
+}
+
+#header {
+	border: 1px red solid;
+}
+
 #container {
 	border: 1px green solid;
+	width: 800px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+#canvas {
+	border: 1px blue dashed;
 }
 </style>
 </head>
 <body>
+<div id='header'>
+<h1>Wifi Whiteboard by Team Win</h1>
+<a id="download" href="">Download as a PNG image</a>
+</div>
 <div id="container">
 <canvas id="canvas">
 	Your browser does not support HTML5 canvas
 </canvas>
 </div>
 
-<div>
-<a id="download" href="">Download as a PNG image</a>
-</div>
 <script>
 var lastPrimitivesCount = 0;
 var lastBoard;
@@ -37,9 +55,9 @@ var paint = function() {
 
 	// Set canvas coordinate system and reset the canvas.
 	var canvas = $('#canvas')[0];
-	var container = $('#container')[0];
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerWidth / board.aspectRatio;
+	canvas.width = window.innerWidth * 0.9;
+	canvas.height = canvas.width / board.aspectRatio;
+	$('#container').css( { width: canvas.width + 2 + 'px' } );
 
 	var context = canvas.getContext('2d');
 	context.save();
@@ -74,7 +92,7 @@ var paint = function() {
 
 	var pngMime = 'image/png';
 	var pngData = canvas.toDataURL(pngMime);
-	var pngDownload = canvas.replace(pngMime, 'image/octet-stream')
+	var pngDownload = pngData.replace(pngMime, 'image/octet-stream')
 	$('#download').attr('href', pngDownload);
 };
 

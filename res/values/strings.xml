@@ -10,6 +10,7 @@
 	
 	<string name="label_remoteurl">Whiteboard server available at: http:/%1$s:%2$s</string>
 	<string name="label_stopping_whiteboard">Whiteboard server stopped</string>
+	<string name="label_createWhiteBoard">Create White Board</string>
 	<string name="label_defaultWhiteBoardTitle">Untitled</string>
 	
 	<string name="menu_shutdown">Shutdown</string>

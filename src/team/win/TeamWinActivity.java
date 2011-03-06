@@ -86,7 +86,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		if (position == 0) {
 			startActivity(new Intent(TeamWinActivity.this, WhiteBoardActivity.class));
 		} else {
-			startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position).id));
+			startActivity(new Intent(this, WhiteBoardActivity.class).putExtra("ID", existingWhiteBoards.get(position - 1).id));
 		}
 	}
 
@@ -136,7 +136,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id).id);
+						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id - 1).id);
 						dialog.dismiss();
 					}
 				})
@@ -218,11 +218,11 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 			String title;
 			String subtitle;
 			if (position == 0) {
-				title = "Create White Board";
-				subtitle = "";
+				title = getResources().getString(R.string.label_createWhiteBoard);
+				subtitle = "Starts a new white board session";
 			} else {
 				title = existingWhiteBoards.get(position - 1).title;
-				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified);
+				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified * 1000L);
 				subtitle = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
 			}
 			
