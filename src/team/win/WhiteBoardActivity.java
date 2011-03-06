@@ -54,7 +54,6 @@ public class WhiteBoardActivity extends Activity {
 		0xFFFF6800, Color.YELLOW, Color.LTGRAY, Color.GRAY, Color.WHITE, };
 
 	private DataStore mDataStore = new DataStore();
-	private UndoManager mUndoManager = new UndoManager();
 	private WhiteBoardView mWhiteBoardView;
 	private DatabaseHelper databaseHelper;
 	private WhiteBoard whiteBoard;
@@ -113,7 +112,6 @@ public class WhiteBoardActivity extends Activity {
 		setContentView(mWhiteBoardView);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
-		mUndoManager.setContentView(mWhiteBoardView);
 	}
 
 	@Override
@@ -165,9 +163,27 @@ public class WhiteBoardActivity extends Activity {
 			mWhiteBoardView.setPrimColor(Color.WHITE);
 			return true;
 		case R.id.menu_clear:
-			mWhiteBoardView.resetPoints();
+			new AlertDialog.Builder(this)
+				.setTitle("Really clear whiteboard?")
+				.setCancelable(true)
+				.setNegativeButton(
+					android.R.string.cancel,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							System.out.println("Phew");
+						}
+					})
+				.setNeutralButton(
+					android.R.string.yes,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							mDataStore.clear();
+							mWhiteBoardView.invalidate();
+						}
+					}).show(); 
+			return true;
 		case R.id.menu_undo:
-			mUndoManager.undo();
+			mWhiteBoardView.undo();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

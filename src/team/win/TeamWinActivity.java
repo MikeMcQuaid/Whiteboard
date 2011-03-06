@@ -85,11 +85,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 			// We want to allow the user to switch to other applications
 			// whilst the whiteboard is running and still give the user the ability to
 			// explicitly shutdown the application and stop the web server.
-			//finish();
-			WhiteBoard newWhiteBoard = new WhiteBoard();
-			newWhiteBoard.title = "Test";
-			newWhiteBoard.lastModified = 12324;
-			databaseHelper.addWhiteBoard(newWhiteBoard);
+			finish();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
