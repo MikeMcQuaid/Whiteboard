@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -127,6 +128,14 @@ public class WhiteBoardActivity extends Activity {
 		// Show menu options in Honeycomb action bar
 		Utils.showMenuItemsInActionBar(menu, new int[] { R.id.menu_color, R.id.menu_stroke_width, R.id.menu_eraser });
 		return true;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		Toast toast = Toast.makeText(this, "IP address", 3);
+		toast.setGravity(Gravity.TOP, 0, 0);
+		toast.show();
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
