@@ -69,12 +69,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_shutdown:
-			// TODO We need to properly shutdown the HTTP server.
-			// We want to allow the user to switch to other applications
-			// whilst the whiteboard is running and still give the user the ability to
-			// explicitly shutdown the application and stop the web server.
-			finish();
+		case R.id.menu_help:
+			startActivity(new Intent(this, HelpActivity.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

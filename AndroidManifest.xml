@@ -28,6 +28,10 @@
 			android:screenOrientation="landscape">
 		</activity>
 		
+		<activity 
+			android:name=".HelpActivity">
+		</activity>
+		
 		<service android:name="HttpService"></service>
 
 	</application>

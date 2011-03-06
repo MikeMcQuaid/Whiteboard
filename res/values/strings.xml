@@ -13,7 +13,7 @@
 	<string name="label_createWhiteBoard">Create White Board</string>
 	<string name="label_defaultWhiteBoardTitle">Untitled</string>
 	
-	<string name="menu_shutdown">Shutdown</string>
+	<string name="menu_help">Help</string>
 	<string name="menu_save">Save</string>
 	<string name="menu_load">Load</string>
 	<string name="menu_stroke_width">Width</string>
