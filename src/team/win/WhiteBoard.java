@@ -7,6 +7,6 @@ public class WhiteBoard {
 
 	public long id = -1;
 	public String title;
-	public long lastModified;
+	public int lastModified;
 	
 }

@@ -225,7 +225,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 				subtitle = "";
 			} else {
 				title = existingWhiteBoards.get(position - 1).title;
-				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified);
+				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified * 1000L);
 				subtitle = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
 			}
 			
