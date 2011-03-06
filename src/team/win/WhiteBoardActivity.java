@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Random;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -101,7 +100,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
 		case R.id.menu_color:
-			new ColorPickerDialog(this, this, mWhiteBoardView.getPaint().getColor()).show();
+			new ColorPickerDialog(this, this, 255).show();
 			/*mWhiteBoardView.setPrimColor(
 				Color.argb(255,
 						   mRandomSource.nextInt(255),
