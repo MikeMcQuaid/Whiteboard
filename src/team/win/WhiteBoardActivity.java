@@ -26,6 +26,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 	private static final int STROKE_WIDTH_DIALOG_ID = 1;
 
 	private DataStore mDataStore = new DataStore();
+	private UndoManager mUndoManager = new UndoManager();
 	private WhiteBoardView mWhiteBoardView;
 
 	private enum StrokeWidth {
@@ -66,6 +67,7 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		bindService(makeServiceIntent(), serviceConnection, 0);
+		mUndoManager.setContentView(mWhiteBoardView);
 	}
 	
 	private Intent makeServiceIntent() {
@@ -90,9 +92,10 @@ public class WhiteBoardActivity extends Activity implements ColorPickerDialog.On
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
 		case R.id.menu_color:
-			new ColorPickerDialog(this, this, mWhiteBoardView.getPaint().getColor()).show();
+			new ColorPickerDialog(this, this, Color.RED).show();
 			return true;
 		case R.id.menu_undo:
+			mUndoManager.undo();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
