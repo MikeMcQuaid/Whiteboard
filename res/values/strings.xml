@@ -8,7 +8,8 @@
 	<string name="title_dialog_change_title">Change Title</string>
 	<string name="title_dialog_delete">Delete</string>
 	
-	<string name="label_remoteurl">Access at: http:/%1$s:%2$s</string>
+	<string name="label_remoteurl">Whiteboard server available at: http:/%1$s:%2$s</string>
+	<string name="label_stopping_whiteboard">Whiteboard server stopped</string>
 	<string name="label_createWhiteBoard">Create White Board</string>
 	<string name="label_defaultWhiteBoardTitle">Untitled</string>
 	

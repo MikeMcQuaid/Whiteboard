@@ -21,14 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class TeamWinActivity extends ListActivity implements DatabaseHelper.Listener {
 	
-	private static final String TAG = "TW_TeamWinActivity";
+	private static final String TAG = Utils.buildLogTag(TeamWinActivity.class);
 	
 	private static final int ID_CONTEXTMENU_CHANGE_TITLE = 0;
 	private static final int ID_CONTEXTMENU_DELETE_WHITEBOARD = 1;
@@ -51,8 +50,6 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		setListAdapter(listAdapter);
 		
 		registerForContextMenu(findViewById(android.R.id.list));
-		
-		startService(makeServiceIntent());
 	}
 
 	@Override
