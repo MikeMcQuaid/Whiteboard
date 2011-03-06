@@ -19,7 +19,6 @@ public class WhiteBoardView extends View {
 	private final DataStore mDataStore;
 	
 	private List<Point> mPoints;
-	private HttpService mHttpService;
 
 	private float mWidth, mHeight;
 	private float mStrokeWidth;
@@ -55,10 +54,6 @@ public class WhiteBoardView extends View {
 
 	private void resetPoints() {
 		mPoints = new LinkedList<Point>();
-	}
-
-	public void setHttpService(HttpService httpService) {
-		this.mHttpService = httpService;
 	}
 	
 	public void undo() {
@@ -132,9 +127,6 @@ public class WhiteBoardView extends View {
 		resetPoints();
 		mPoints.add(new Point(x / mWidth, y / mHeight));
 		mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
-		if (mHttpService != null) {
-			mHttpService.setDataStore(mDataStore);
-		}
 	}
 
 	private void touchMove(float x, float y) {
@@ -147,9 +139,6 @@ public class WhiteBoardView extends View {
 			mPoints.add(new Point(x / mWidth, y / mHeight));
 			mDataStore.remove(mDataStore.size() - 1);
 			mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
-			if (mHttpService != null) {
-				mHttpService.setDataStore(mDataStore);
-			}
 			mX = x;
 			mY = y;
 		}

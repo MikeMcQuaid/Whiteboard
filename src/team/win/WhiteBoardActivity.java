@@ -235,7 +235,8 @@ public class WhiteBoardActivity extends Activity {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			mWhiteBoardView.setHttpService(((HttpService.HttpServiceBinder) service).getService());
+			HttpService httpService = ((HttpService.HttpServiceBinder) service).getService();
+			httpService.setDataStore(mDataStore);
 			
 			Toast toast = Toast.makeText(WhiteBoardActivity.this, Utils.getFormattedUrl(getResources()), 3);
 			toast.setGravity(Gravity.TOP, 0, 0);
