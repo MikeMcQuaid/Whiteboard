@@ -135,9 +135,6 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_save:
 			save();
 			return true;
-		case R.id.menu_load:
-			//loadFromSdCard();
-			return true;
 		case R.id.menu_stroke_width:
 			showDialog(STROKE_WIDTH_DIALOG_ID);
 			return true;
