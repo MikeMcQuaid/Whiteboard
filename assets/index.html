@@ -74,7 +74,7 @@ var paint = function() {
 
 	var pngMime = 'image/png';
 	var pngData = canvas.toDataURL(pngMime);
-	var pngDownload = canvas.replace(pngMime, 'image/octet-stream')
+	var pngDownload = pngData.replace(pngMime, 'image/octet-stream')
 	$('#download').attr('href', pngDownload);
 };
 
