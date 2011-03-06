@@ -71,7 +71,7 @@ public class HttpService extends Service {
 			server.stop();
 		} catch (Exception e) {
 			Log.w("Teamwin", "Unable to stop server", e);
-			Toast.makeText(getApplicationContext(), "Unable to stop server: " + e.getMessage(), 3).show();
+			Toast.makeText(this, "Unable to stop server: " + e.getMessage(), 3).show();
 		}
 	}
 	

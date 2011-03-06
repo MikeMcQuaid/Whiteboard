@@ -19,82 +19,53 @@ html, body {
 </style>
 </head>
 <body>
+<div>
 <canvas id="canvas">
 	Your browser does not support HTML5 canvas
 </canvas>
+</div>
 
+<div>
+<a id="download" href="">Download</a>
+</div>
 <script>
-var serverTime = 0;
-
-var num = 0;
-var testBoard = function() {
-	var primitives = []
-	for (var i = 0; i < num; i++) {
-		var baseY = i * 10;
-		primitives.push({ color: '#cccccc', strokeWidth: 1, points: [i, baseY + 100, 100, i * 2 + 200, 200, i + 100] });
-	}
-	num++;
-	return { width: 800, height: 480, primitives: primitives };
-};
-
+var lastPrimitivesCount = 0;
 var lastBoard;
-var scaleFactor = 0;
-
-// TODO: Stop resize from running constantly.
-var resize = function() {
-	var board = lastBoard;
-
-	// Set canvas coordinate system to the same as the device and reset the canvas.
-	var canvas = $('#canvas')[0];
-	canvas.width = board.width;
-	canvas.height = board.height;
-
-	// Use CSS to scale the canvas to the window.
-	boardAspect = board.width / board.height;
-	windowAspect = window.innerWidth / window.innerHeight;
-
-	if (boardAspect > 1) {
-		newWidth = window.innerWidth;
-		newHeight = window.innerWidth / boardAspect;
-	}
-	else {
-		newHeight = window.innerHeight;
-		newWidth = window.innerHeight / boardAspect;
-	}
-
-	canvas.width = newWidth
-	canvas.height = newHeight
-	scaleFactor = canvas.width/board.width;
-}
 
 var paint = function() {
-	if (scaleFactor == 0)
-		resize();
-
 	var board = lastBoard;
 
-	// Reset the canvas.
+	// Set canvas coordinate system and reset the canvas.
 	var canvas = $('#canvas')[0];
-	canvas.width = canvas.width;
-	canvas.height = canvas.height;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerWidth / board.aspectRatio;
 
 	var context = canvas.getContext('2d');
 	context.save();
 
 	context.lineCap = 'round';
 	context.lineJoin = 'round';
-	context.scale(scaleFactor, scaleFactor);
+	context.scale(canvas.height, canvas.height);
 	$.each(board.primitives, function(index, primitive) {
+		if (!primitive.points)
+			return false;
+
+		lastPrimitivesCount = primitive.points.length;
+
 		context.beginPath();
-		for (var i = 0; i < (primitive.points.length / 2); i++) {
-			var point = primitive.points.slice(i * 2, (i * 2) + 2);
-			if (i == 0) {
-				context.moveTo(point[0], point[1]); // don't paint on first point.
-			} else {
-				context.lineTo(point[0], point[1]);
-			}
+		var lastX = 0;
+		var lastY = 0;
+		for (var point = 0; point < primitive.points.length; point+=2) {
+			var x = primitive.points[point] * board.aspectRatio;
+			var y = primitive.points[point+1];
+			if (lastX && lastY)
+				context.quadraticCurveTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+			else
+				context.moveTo(x, y);
+			lastX = x;
+			lastY = y;
 		}
-		context.lineWidth = primitive.strokeWidth * 1.2;
+		context.lineWidth = primitive.strokeWidth;
 		context.strokeStyle = '#' + primitive.color;
 		context.stroke();
 	});
@@ -102,35 +73,34 @@ var paint = function() {
 
 	context.save();
 	context.strokeRect(0, 0, canvas.width, canvas.height);
-	if (serverTime)
-		context.fillText("The time sponsored by Android will read: " + serverTime, 50, 50);
 	context.restore();
+
+	//var pngData = canvas.toDataURL('image/png');
+	//var pngDownload = canvas.replace('image/png', 'image/octet-stream')
+	//$('#download').attr('href', pngDownload);
 };
 
 $(document).ready(function() {
-	var fetchTime = function() {
-		$.get('/time', function(time) {
-			$('#time').html(time);
-			serverTime = time;
+	var checkModified = function() {
+		$.get('/modified/' + lastPrimitivesCount, function(modified) {
+			lastPrimitivesCount = modified;
 		});
 	};
 	
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
 		$.get('/board.json', function(board) {
-//			lastBoard = testBoard();
 			lastBoard = board;
 			paint();
 		});
 	};
 	
-	window.setInterval(fetchTime, 1000);
+	//window.setInterval(checkModified, 1000);
 	window.setInterval(refreshBoard, 500);
 	paint();
 });
 
 $(window).resize(function() {
-	scaleFactor = 0;
 	paint();
 });
 </script>

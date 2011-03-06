@@ -3,7 +3,9 @@
 	package="team.win"
 	android:versionCode="1"
 	android:versionName="1.0">
-	<uses-sdk android:targetSdkVersion="7" android:maxSdkVersion="10" android:minSdkVersion="7" />
+	
+	<!-- Set target to Honeycomb to enable nicer themes -->
+	<uses-sdk android:minSdkVersion="7" android:targetSdkVersion="11" android:maxSdkVersion="11" />
 
 	<application 
 		android:icon="@drawable/icon" 
@@ -22,7 +24,7 @@
 		
 		<activity 
 			android:name=".WhiteBoardActivity"
-			android:theme="@android:style/Theme.NoTitleBar"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 			android:screenOrientation="landscape">
 		</activity>
 		
@@ -31,4 +33,5 @@
 	</application>
 	
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 </manifest>
