@@ -86,9 +86,9 @@ public class WhiteBoardView extends View {
 			for (int i = 1; i < points.length - 1; i++) {
 				pX = points[i].mX * mWidth;
 				pY = points[i].mY * mHeight;
-				path.lineTo(pX, pY);
+				path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
 				lX = pX;
-				lY = pX;
+				lY = pY;
 			}
 			c.drawPath(path, mPaint);
 		}
