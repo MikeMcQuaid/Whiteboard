@@ -79,8 +79,6 @@ public class HttpService extends Service {
 			try {
 				if (target.equals("/")) {
 					handleIndex(request, response);
-				} else if (target.startsWith("/time")) {
-					handleTime(request, response);
 				} else if (target.startsWith("/board.json")) {
 					handleBoard(request, response);
 				} else {
@@ -107,14 +105,19 @@ public class HttpService extends Service {
 			IOUtils.copy(getAssets().open("index.html"), response.getOutputStream());
 		}
 		
-		private void handleTime(HttpServletRequest request, HttpServletResponse response) throws IOException {
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("application/json");
-			response.getOutputStream().println(System.currentTimeMillis());
-		}
-		
 		private void handleBoard(HttpServletRequest request, HttpServletResponse response) throws IOException {
-			if (dataStore != null) {
+			// FIXME: This will break if you undo and redo very quickly.
+			// Need a smarter cache, perhaps using a hash of the JSON.
+			int size;
+			try {
+				size = Integer.parseInt(request.getParameter("size"));
+			}
+			catch (NumberFormatException e) {
+				size = -1;
+			}
+
+			response.setHeader("Cache-Control", "no-cache");
+			if (dataStore != null && size != dataStore.size() ) {
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("application/json");
 				response.getWriter().print(dataStore.getAllPrimitivesAsJSON());

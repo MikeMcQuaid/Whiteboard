@@ -66,7 +66,7 @@ a:link, a:visited {
 </div>
 
 <script>
-var lastPrimitivesCount = 0;
+var lastPrimitivesCount = -1;
 var lastBoard = null;
 
 var resize = function() {
@@ -110,10 +110,6 @@ var paint = function() {
 	var context = canvas.getContext('2d');
 	context.save();
 
-	context.save();
-	
-	context.restore();
-
 	// Use the same line styles as on Android.
 	context.lineCap = 'round';
 	context.lineJoin = 'round';
@@ -124,8 +120,6 @@ var paint = function() {
 	$.each(board.primitives, function(index, primitive) {
 		if (!primitive.points)
 			return;
-
-		lastPrimitivesCount = primitive.points.length;
 
 		context.beginPath();
 		if (primitive.points.length > 2) {
@@ -154,7 +148,9 @@ var paint = function() {
 		context.stroke();
 	});
 	context.restore();
-	
+
+	lastPrimitivesCount = board.size;
+
 	// TODO: Probably unnecessary to generate every time.
 	downloadLink();
 };
@@ -185,22 +181,17 @@ $(document).ready(function() {
 		*/
 	});
 	
-	var checkModified = function() {
-		$.get('/modified/' + lastPrimitivesCount, function(modified) {
-			lastPrimitivesCount = modified;
-		});
-	};
-	
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
-		$.get('/board.json', function(board) {
+		$.get('/board.json?size=' + lastPrimitivesCount, function(board) {
+			if (!board)
+				return;
 			lastBoard = board;
 			resize();
 			paint();
 		});
 	};
 	
-	//window.setInterval(checkModified, 1000);
 	// TODO: Change inverval if failed.
 	window.setInterval(refreshBoard, 100);
 	resize();

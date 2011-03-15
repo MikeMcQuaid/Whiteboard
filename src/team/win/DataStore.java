@@ -58,6 +58,7 @@ public class DataStore {
 			JSONObject o = new JSONObject();
 			o.put("aspectRatio", mAspectRatio);
 			o.put("primitives", primitives);
+			o.put("size", size());
 			return o.toString();
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
