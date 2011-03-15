@@ -70,7 +70,7 @@ public class DataStore {
 				JSONObject o = new JSONObject();
 				o.put("aspectRatio", mAspectRatio);
 				o.put("primitives", primitives);
-				long time = System.currentTimeMillis();
+				long time = System.nanoTime();
 				o.put("cacheTime", time);
 				mJSONCache = o.toString();
 				mJSONCacheTime = time;
