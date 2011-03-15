@@ -14,17 +14,22 @@ import org.json.JSONObject;
 public class DataStore {
 	protected LinkedList<Primitive> mPrimitiveList;
 	private float mAspectRatio;
+	transient String mJSONCache;
+	transient long mJSONCacheTime;
 
 	public DataStore() {
 		super();
 		mPrimitiveList = new LinkedList<Primitive>();
+		mJSONCacheTime = 0;
 	}
 
 	public boolean add(Primitive p) {
+		mJSONCacheTime = 0;
 		return mPrimitiveList.add(p);
 	}
 
 	public Primitive remove(int index) {
+		mJSONCacheTime = 0;
 		return mPrimitiveList.remove(index);
 	}
 
@@ -33,36 +38,47 @@ public class DataStore {
 	}
 
 	public void clear() {
+		mJSONCacheTime = 0;
 		mPrimitiveList.clear();
 	}
 
 	public void setAspectRatio(float aspectRatio) {
+		mJSONCacheTime = 0;
 		mAspectRatio = aspectRatio;
 	}
 
+	public long getCacheTime() {
+		return mJSONCacheTime;
+	}
+
 	public String getAllPrimitivesAsJSON() {
-		try {
-			JSONArray primitives = new JSONArray();
-			for (Primitive primitive : mPrimitiveList) {
-				JSONArray pointArray = new JSONArray();
-				for (Point point : primitive.mPoints) {
-					pointArray.put(point.mX);
-					pointArray.put(point.mY);
+		if (mJSONCacheTime == 0) {
+			try {
+				JSONArray primitives = new JSONArray();
+				for (Primitive primitive : mPrimitiveList) {
+					JSONArray pointArray = new JSONArray();
+					for (Point point : primitive.mPoints) {
+						pointArray.put(point.mX);
+						pointArray.put(point.mY);
+					}
+					JSONObject primObject = new JSONObject();
+					primObject.put("color", String.format("%06x", primitive.mColor));
+					primObject.put("strokeWidth", primitive.mStrokeWidth);
+					primObject.put("points", pointArray);
+					primitives.put(primObject);
 				}
-				JSONObject primObject = new JSONObject();
-				primObject.put("color", String.format("%06x", primitive.mColor));
-				primObject.put("strokeWidth", primitive.mStrokeWidth);
-				primObject.put("points", pointArray);
-				primitives.put(primObject);
+				JSONObject o = new JSONObject();
+				o.put("aspectRatio", mAspectRatio);
+				o.put("primitives", primitives);
+				long time = System.currentTimeMillis();
+				o.put("cacheTime", time);
+				mJSONCache = o.toString();
+				mJSONCacheTime = time;
+			} catch (JSONException e) {
+				throw new RuntimeException(e);
 			}
-			JSONObject o = new JSONObject();
-			o.put("aspectRatio", mAspectRatio);
-			o.put("primitives", primitives);
-			o.put("size", size());
-			return o.toString();
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
 		}
+		return mJSONCache;
 	}
 
 	public void serializeDataStore(OutputStream outputStream) throws IOException {

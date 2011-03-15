@@ -66,7 +66,7 @@ a:link, a:visited {
 </div>
 
 <script>
-var lastPrimitivesCount = -1;
+var lastBoardTime = -1;
 var lastBoard = null;
 
 var resize = function() {
@@ -149,7 +149,7 @@ var paint = function() {
 	});
 	context.restore();
 
-	lastPrimitivesCount = board.size;
+	lastBoardTime = board.cacheTime;
 
 	// TODO: Probably unnecessary to generate every time.
 	downloadLink();
@@ -183,7 +183,7 @@ $(document).ready(function() {
 	
 	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
-		$.get('/board.json?size=' + lastPrimitivesCount, function(board) {
+		$.get('/board.json?cacheTime=' + lastBoardTime, function(board) {
 			if (!board)
 				return;
 			lastBoard = board;

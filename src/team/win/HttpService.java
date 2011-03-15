@@ -106,18 +106,16 @@ public class HttpService extends Service {
 		}
 		
 		private void handleBoard(HttpServletRequest request, HttpServletResponse response) throws IOException {
-			// FIXME: This will break if you undo and redo very quickly.
-			// Need a smarter cache, perhaps using a hash of the JSON.
-			int size;
+			long cacheTime;
 			try {
-				size = Integer.parseInt(request.getParameter("size"));
+				cacheTime = Long.parseLong(request.getParameter("cacheTime"));
 			}
 			catch (NumberFormatException e) {
-				size = -1;
+				cacheTime = -1;
 			}
 
 			response.setHeader("Cache-Control", "no-cache");
-			if (dataStore != null && size != dataStore.size() ) {
+			if (dataStore != null && cacheTime != dataStore.getCacheTime() ) {
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("application/json");
 				response.getWriter().print(dataStore.getAllPrimitivesAsJSON());
