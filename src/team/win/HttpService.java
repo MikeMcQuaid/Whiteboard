@@ -39,6 +39,7 @@ public class HttpService extends Service {
 	public HttpService() {
 		server = new Server(PORT_NUMBER);
 		server.setHandler(new Handler());
+		server.setSendServerVersion(false);
 	}
 	
 	public void setDataStore(DataStore dataStore) {
