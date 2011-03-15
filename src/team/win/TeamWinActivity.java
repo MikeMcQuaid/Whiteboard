@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 public class TeamWinActivity extends ListActivity implements DatabaseHelper.Listener {
 	
+	@SuppressWarnings("unused")
 	private static final String TAG = Utils.buildLogTag(TeamWinActivity.class);
 	
 	private static final int ID_CONTEXTMENU_CHANGE_TITLE = 0;
