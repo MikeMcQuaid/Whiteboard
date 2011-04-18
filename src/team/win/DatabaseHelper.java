@@ -73,7 +73,7 @@ public class DatabaseHelper {
 		checkConnectionOpen();
 		List<WhiteBoard> whiteBoards = new LinkedList<WhiteBoard>();
 		
-		// For each row in the white boards table we initalise a WhiteBoard object.
+		// For each row in the white boards table we initialise a WhiteBoard object.
 		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, null, null, null, null, null);
 		while (cursor.moveToNext()) {
 			WhiteBoard nextWhiteBoard = new WhiteBoard();
