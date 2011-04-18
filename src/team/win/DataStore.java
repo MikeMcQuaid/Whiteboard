@@ -23,12 +23,12 @@ public class DataStore {
 		mJSONCacheTime = 0;
 	}
 
-	public boolean add(Primitive p) {
+	public synchronized boolean add(Primitive p) {
 		mJSONCacheTime = 0;
 		return mPrimitiveList.add(p);
 	}
 
-	public Primitive remove(int index) {
+	public synchronized Primitive remove(int index) {
 		mJSONCacheTime = 0;
 		return mPrimitiveList.remove(index);
 	}
@@ -37,7 +37,7 @@ public class DataStore {
 		return mPrimitiveList.size();
 	}
 
-	public void clear() {
+	public synchronized void clear() {
 		mJSONCacheTime = 0;
 		mPrimitiveList.clear();
 	}
@@ -51,7 +51,7 @@ public class DataStore {
 		return mJSONCacheTime;
 	}
 
-	public String getAllPrimitivesAsJSON() {
+	public synchronized String getAllPrimitivesAsJSON() {
 		if (mJSONCacheTime == 0) {
 			try {
 				JSONArray primitives = new JSONArray();
@@ -86,7 +86,7 @@ public class DataStore {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void deserializeDataStore(InputStream inputStream) throws IOException {
+	public synchronized void deserializeDataStore(InputStream inputStream) throws IOException {
 		try {
 			mPrimitiveList = (LinkedList<Primitive>)new ObjectInputStream(inputStream).readObject();
 			System.out.println("Loaded prims");
