@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>TeamWin</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold' rel='stylesheet' type='text/css'>
 <style>
 html, body {
@@ -116,11 +116,14 @@ var resize = function() {
 	}
 
 	// Add 2 pixels for each border;
+	// TODO: Animate?
 	$('#container').css( { width: canvas.width + 2 + 'px' } );
 	$('#container').css( { height: canvas.height + 2 + 'px' } );
 }
 
 var paint = function() {
+	resize();
+
 	if (!lastBoard)
 		return;
 	
@@ -188,41 +191,20 @@ var downloadLink = function() {
 }
 
 $(document).ready(function() {
-	$.ajaxSetup({
-		/*
-		error:function(x,e){
-			if(x.status==404)
-				alert('Requested URL not found.');
-			else if(x.status==500)
-				alert('Internel Server Error.');
-			else if(e=='parsererror')
-				alert('Error.\nParsing JSON Request failed.'
-			else if(e=='timeout')
-				alert('Request Time out.');
-			else
-				alert('Unknown Error.\n'+x.responseText);
-		}
-		*/
-	});
-	
-	var canvas = $('#canvas')[0];
 	var refreshBoard = function() {
-		$.get('/board.json?cacheTime=' + lastBoardTime, function(board) {
+		$.getJSON('/board.json?cacheTime=' + lastBoardTime, function(board) {
 			if (!board)
 				return;
 			lastBoard = board;
-			resize();
 			paint();
 		});
 	};
 	
-	// TODO: Change inverval if failed.
+	paint();
 	window.setInterval(refreshBoard, 100);
-	resize();
 });
 
 $(window).resize(function() {
-	resize();
 	paint();
 });
 </script>
