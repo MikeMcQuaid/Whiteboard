@@ -22,6 +22,7 @@
 	<string name="menu_undo">Undo</string>
 	<string name="menu_clear">Clear</string>
 	<string name="menu_eraser">Eraser</string>
+	<string name="menu_zoom">Zoom</string>
 	
 	<string name="contextmenu_change_title">Change Title</string>
 	<string name="contextmenu_delete_whiteboard">Delete</string>

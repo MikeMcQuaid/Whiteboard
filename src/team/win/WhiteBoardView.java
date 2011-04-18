@@ -20,6 +20,7 @@ public class WhiteBoardView extends View {
 	
 	private List<Point> mPoints;
 
+	private float mZoomLevel = 2.0f;
 	private float mWidth, mHeight;
 	private float mStrokeWidth;
 	private float mX, mY;
@@ -71,24 +72,24 @@ public class WhiteBoardView extends View {
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
 			mPaint.setColor(p.mColor | 0xFF000000);
-			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth);
+			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth * mZoomLevel);
 			if (p.mPoints.size() > 1) {
 				Path path = new Path();
 				float pX, pY;
-				float lX = p.mPoints.get(0).mX * mWidth;
-				float lY = p.mPoints.get(0).mY * mHeight;
+				float lX = p.mPoints.get(0).mX * mWidth * mZoomLevel;
+				float lY = p.mPoints.get(0).mY * mHeight * mZoomLevel;
 				path.moveTo(lX, lY);
 				for (int i = 1; i < p.mPoints.size() - 1; i++) {
-					pX = p.mPoints.get(i).mX * mWidth;
-					pY = p.mPoints.get(i).mY * mHeight;
+					pX = p.mPoints.get(i).mX * mWidth * mZoomLevel;
+					pY = p.mPoints.get(i).mY * mHeight * mZoomLevel;
 					path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
 					lX = pX;
 					lY = pY;
 				}
 				c.drawPath(path, mPaint);
 			} else {
-				c.drawPoint(p.mPoints.get(0).mX * mWidth,
-							p.mPoints.get(0).mY * mHeight, mPaint);
+				c.drawPoint(p.mPoints.get(0).mX * mWidth * mZoomLevel,
+							p.mPoints.get(0).mY * mHeight * mZoomLevel, mPaint);
 			}
 		}
 	}
@@ -125,8 +126,8 @@ public class WhiteBoardView extends View {
 		if(x < 0.0 || y < 0.0 || x > mWidth || y > mHeight)
 			return;
 		resetPoints();
-		mPoints.add(new Point(x / mWidth, y / mHeight));
-		mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
+		mPoints.add(new Point(x / mWidth / mZoomLevel, y / mHeight / mZoomLevel));
+		mDataStore.add(new Primitive(mStrokeWidth / mWidth / mZoomLevel, mColor, mPoints));
 	}
 
 	private void touchMove(float x, float y) {
@@ -136,9 +137,9 @@ public class WhiteBoardView extends View {
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			mPoints.add(new Point(x / mWidth, y / mHeight));
+			mPoints.add(new Point(x / mWidth / mZoomLevel, y / mHeight / mZoomLevel));
 			mDataStore.remove(mDataStore.size() - 1);
-			mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
+			mDataStore.add(new Primitive(mStrokeWidth / mWidth / mZoomLevel, mColor, mPoints));
 			mX = x;
 			mY = y;
 		}
@@ -150,5 +151,10 @@ public class WhiteBoardView extends View {
 
 	protected void setPrimStrokeWidth(int w) {
 		mStrokeWidth = w;
+	}
+
+	protected void setZoomLevel(float zoomLevel) {
+		mZoomLevel = zoomLevel;
+		invalidate();
 	}
 }
