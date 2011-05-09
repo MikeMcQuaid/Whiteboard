@@ -2,6 +2,8 @@ package team.win;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -20,11 +22,28 @@ public class WhiteBoardView extends View {
 	
 	private List<Point> mPoints;
 
+	private boolean mPendingEventDown;
+	private Timer mEventDownTimer;
 	private float mZoomLevel = 2.0f;
 	private float mWidth, mHeight;
 	private float mStrokeWidth;
 	private float mX, mY;
 	private int mColor;
+	
+	private class EventDownTimerTask extends TimerTask {
+		private float mX, mY;
+
+		public EventDownTimerTask(float x, float y) {
+			mX = x;
+			mY = y;
+		}
+	
+		@Override
+		public void run() {
+			mPendingEventDown = false;
+			touchStart(mX, mY);
+		}
+	}
 
 	public WhiteBoardView(Context context, DataStore ds, int strokeWidth, int color) {
 		super(context);
@@ -107,15 +126,22 @@ public class WhiteBoardView extends View {
 
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			touchStart(x, y);
-			invalidate();
+			if(mPendingEventDown) {
+				mZoomLevel = (mZoomLevel == 1.0f) ? 2.0f : 1.0f;
+				mPendingEventDown = false;
+				mEventDownTimer.cancel();
+				invalidate();
+			} else {
+				mPendingEventDown = true;
+				mEventDownTimer = new Timer();
+				mEventDownTimer.schedule(new EventDownTimerTask(x, y), 250);
+			}
 			break;
 		case MotionEvent.ACTION_MOVE:
-			touchMove(x, y);
-			invalidate();
+			if(!mPendingEventDown)
+				touchMove(x, y);
 			break;
 		case MotionEvent.ACTION_UP:
-			invalidate();
 			break;
 		}
 		return true;
@@ -128,6 +154,7 @@ public class WhiteBoardView extends View {
 		resetPoints();
 		mPoints.add(new Point(x / mWidth / mZoomLevel, y / mHeight / mZoomLevel));
 		mDataStore.add(new Primitive(mStrokeWidth / mWidth / mZoomLevel, mColor, mPoints));
+		postInvalidate();
 	}
 
 	private void touchMove(float x, float y) {
@@ -143,6 +170,7 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
+		invalidate();
 	}
 
 	protected void setPrimColor(int c) {
@@ -151,10 +179,5 @@ public class WhiteBoardView extends View {
 
 	protected void setPrimStrokeWidth(int w) {
 		mStrokeWidth = w;
-	}
-
-	protected void setZoomLevel(float zoomLevel) {
-		mZoomLevel = zoomLevel;
-		invalidate();
 	}
 }

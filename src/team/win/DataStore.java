@@ -33,7 +33,7 @@ public class DataStore {
 		return mPrimitiveList.remove(index);
 	}
 
-	public int size() {
+	public synchronized int size() {
 		return mPrimitiveList.size();
 	}
 

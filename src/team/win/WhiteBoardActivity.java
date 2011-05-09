@@ -39,7 +39,6 @@ public class WhiteBoardActivity extends Activity {
 
 	private static final int STROKE_WIDTH_DIALOG_ID = 0;
 	private static final int COLOR_PICKER_DIALOG_ID = 1;
-	private static final int ZOOM_DIALOG_ID = 2;
 	
 	private static final String WHITEBOARD_DATA_FOLDER_PATH;
 	static {
@@ -58,7 +57,6 @@ public class WhiteBoardActivity extends Activity {
 	private WhiteBoardView mWhiteBoardView;
 	private DatabaseHelper databaseHelper;
 	private WhiteBoard whiteBoard;
-	private boolean mZoomedOut;
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"),
@@ -184,9 +182,6 @@ public class WhiteBoardActivity extends Activity {
 		case R.id.menu_undo:
 			mWhiteBoardView.undo();
 			return true;
-		case R.id.menu_zoom:
-			showDialog(ZOOM_DIALOG_ID);
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -195,7 +190,7 @@ public class WhiteBoardActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-		case STROKE_WIDTH_DIALOG_ID: {
+		case STROKE_WIDTH_DIALOG_ID:
 			final CharSequence[] items = StrokeWidth.AS_STRINGS;
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -208,7 +203,6 @@ public class WhiteBoardActivity extends Activity {
 				}
 			});
 			return builder.create();
-		}
 		case COLOR_PICKER_DIALOG_ID:
 			final Dialog dialog = new Dialog(this);
 			dialog.setTitle("Choose colour");
@@ -233,28 +227,9 @@ public class WhiteBoardActivity extends Activity {
 				}
 			});
 			return dialog;
-		case ZOOM_DIALOG_ID: {
-			final String[] items = { "Out", "In" };
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Zoom?");
-			builder.setSingleChoiceItems(items, (mZoomedOut == false) ? 1 : 0, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					setZoomedOut((item == 0) ? true : false);
-					dialog.dismiss();
-				}
-			});
-			return builder.create();
-		}
 		default:
 			return super.onCreateDialog(id);
 		}
-	}
-	
-	private void setZoomedOut(boolean zoomedOut)
-	{
-		mWhiteBoardView.setZoomLevel(zoomedOut ? 1.0f : 2.0f);
-		mZoomedOut = zoomedOut;
 	}
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
