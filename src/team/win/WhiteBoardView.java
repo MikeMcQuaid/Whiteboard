@@ -91,26 +91,29 @@ public class WhiteBoardView extends View {
 		temp.setStyle(Paint.Style.FILL);
 		c.drawRect(0, 0, mWidth, mHeight, temp);
 
+		// Keep this algorithm synchronized with HTML5 canvas paint function
 		for (Primitive p : mDataStore.mPrimitiveList) {
-			Point screenPoint = worldToScreen(p.mPoints.get(0));
+			Point firstScreenPoint = worldToScreen(p.mPoints.get(0));
+			float firstPointX = firstScreenPoint.mX;
+			float firstPointY = firstScreenPoint.mY;
 			mPaint.setColor(p.mColor | 0xFF000000);
 			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth * mZoomLevel);
 			if (p.mPoints.size() > 1) {
 				Path path = new Path();
-				float lX = screenPoint.mX;
-				float lY = screenPoint.mY;
-				path.moveTo(lX, lY);
+				float lastX = firstPointX;
+				float lastY = firstPointY;
+				path.moveTo(lastX, lastY);
 				for (int i = 1; i < p.mPoints.size() - 1; i++) {
-					screenPoint = worldToScreen(p.mPoints.get(i));
-					float pX = screenPoint.mX;
-					float pY = screenPoint.mY;
-					path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
-					lX = pX;
-					lY = pY;
+					firstScreenPoint = worldToScreen(p.mPoints.get(i));
+					float pointX = firstScreenPoint.mX;
+					float pointY = firstScreenPoint.mY;
+					path.quadTo(lastX, lastY, (lastX + pointX) / 2, (lastY + pointY) / 2);
+					lastX = pointX;
+					lastY = pointY;
 				}
 				c.drawPath(path, mPaint);
 			} else {
-				c.drawPoint(screenPoint.mX, screenPoint.mY, mPaint);
+				c.drawPoint(firstPointX, firstPointY, mPaint);
 			}
 		}
 	}
