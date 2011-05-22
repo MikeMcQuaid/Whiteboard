@@ -25,6 +25,8 @@ public class WhiteBoardView extends View {
 	private boolean mPendingEventDown;
 	private Timer mEventDownTimer;
 	private float mZoomLevel = 2.0f;
+	private float mBoardOffsetX = 0.0f;
+	private float mBoardOffsetY = 0.0f;
 	private float mWidth, mHeight;
 	private float mStrokeWidth;
 	private float mX, mY;
@@ -90,25 +92,25 @@ public class WhiteBoardView extends View {
 		c.drawRect(0, 0, mWidth, mHeight, temp);
 
 		for (Primitive p : mDataStore.mPrimitiveList) {
+			Point screenPoint = worldToScreen(p.mPoints.get(0));
 			mPaint.setColor(p.mColor | 0xFF000000);
 			mPaint.setStrokeWidth(p.mStrokeWidth * mWidth * mZoomLevel);
 			if (p.mPoints.size() > 1) {
 				Path path = new Path();
-				float pX, pY;
-				float lX = p.mPoints.get(0).mX * mWidth * mZoomLevel;
-				float lY = p.mPoints.get(0).mY * mHeight * mZoomLevel;
+				float lX = screenPoint.mX;
+				float lY = screenPoint.mY;
 				path.moveTo(lX, lY);
 				for (int i = 1; i < p.mPoints.size() - 1; i++) {
-					pX = p.mPoints.get(i).mX * mWidth * mZoomLevel;
-					pY = p.mPoints.get(i).mY * mHeight * mZoomLevel;
+					screenPoint = worldToScreen(p.mPoints.get(i));
+					float pX = screenPoint.mX;
+					float pY = screenPoint.mY;
 					path.quadTo(lX, lY, (lX + pX) / 2, (lY + pY) / 2);
 					lX = pX;
 					lY = pY;
 				}
 				c.drawPath(path, mPaint);
 			} else {
-				c.drawPoint(p.mPoints.get(0).mX * mWidth * mZoomLevel,
-							p.mPoints.get(0).mY * mHeight * mZoomLevel, mPaint);
+				c.drawPoint(screenPoint.mX, screenPoint.mY, mPaint);
 			}
 		}
 	}
@@ -127,14 +129,14 @@ public class WhiteBoardView extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			if(mPendingEventDown) {
-				mZoomLevel = (mZoomLevel == 1.0f) ? 2.0f : 1.0f;
+				toggleZoomLevel(x, y);
 				mPendingEventDown = false;
 				mEventDownTimer.cancel();
 				invalidate();
 			} else {
 				mPendingEventDown = true;
 				mEventDownTimer = new Timer();
-				mEventDownTimer.schedule(new EventDownTimerTask(x, y), 250);
+				mEventDownTimer.schedule(new EventDownTimerTask(x, y), 150);
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
@@ -152,8 +154,8 @@ public class WhiteBoardView extends View {
 		if(x < 0.0 || y < 0.0 || x > mWidth || y > mHeight)
 			return;
 		resetPoints();
-		mPoints.add(new Point(x / mWidth / mZoomLevel, y / mHeight / mZoomLevel));
-		mDataStore.add(new Primitive(mStrokeWidth / mWidth / mZoomLevel, mColor, mPoints));
+		mPoints.add(screenToWorld(x, y));
+		mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
 		postInvalidate();
 	}
 
@@ -164,9 +166,9 @@ public class WhiteBoardView extends View {
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			mPoints.add(new Point(x / mWidth / mZoomLevel, y / mHeight / mZoomLevel));
+			mPoints.add(screenToWorld(x, y));
 			mDataStore.remove(mDataStore.size() - 1);
-			mDataStore.add(new Primitive(mStrokeWidth / mWidth / mZoomLevel, mColor, mPoints));
+			mDataStore.add(new Primitive(mStrokeWidth / mWidth, mColor, mPoints));
 			mX = x;
 			mY = y;
 		}
@@ -179,5 +181,37 @@ public class WhiteBoardView extends View {
 
 	protected void setPrimStrokeWidth(int w) {
 		mStrokeWidth = w;
+	}
+
+	private void toggleZoomLevel(float x, float y) {
+		if(mZoomLevel == 2.0f) {
+			// zooming out, don't want offsets
+			mBoardOffsetX = 0.0f;
+			mBoardOffsetY = 0.0f;
+			mZoomLevel = 1.0f;
+		} else {
+			// x,y are the centre of zoom box; compute top-left
+			// corner and rewrite in world coordinates
+			x = (x / mWidth) - 0.25f;
+			y = (y / mHeight) - 0.25f;
+
+			// clamp to max 0.5f,0.5f (bottom-right quadrant)
+			x = Math.max(Math.min(x, 0.5f), 0.0f);
+			y = Math.max(Math.min(y, 0.5f), 0.0f);
+
+			mBoardOffsetX = x;
+			mBoardOffsetY = y;
+			mZoomLevel = 2.0f;
+		}
+	}
+
+	private Point worldToScreen(Point p) {
+		return new Point((p.mX - mBoardOffsetX) * mWidth * mZoomLevel,
+						 (p.mY - mBoardOffsetY) * mHeight * mZoomLevel);
+	}
+
+	private Point screenToWorld(float x, float y) {
+		return new Point(x / mWidth / mZoomLevel + mBoardOffsetX,
+						 y / mHeight / mZoomLevel + mBoardOffsetY);
 	}
 }
