@@ -31,6 +31,7 @@ public class WhiteBoardView extends View {
 	private float mStrokeWidth;
 	private float mX, mY;
 	private int mColor;
+	private String mDrawIp;
 	
 	private class EventDownTimerTask extends TimerTask {
 		private float mX, mY;
@@ -86,10 +87,10 @@ public class WhiteBoardView extends View {
 	}
 
 	protected void onDraw(Canvas c) {
-		Paint temp = new Paint();
-		temp.setColor(Color.WHITE);
-		temp.setStyle(Paint.Style.FILL);
-		c.drawRect(0, 0, mWidth, mHeight, temp);
+		Paint background = new Paint();
+		background.setColor(Color.WHITE);
+		background.setStyle(Paint.Style.FILL);
+		c.drawRect(0, 0, mWidth, mHeight, background);
 
 		// Keep this algorithm synchronized with HTML5 canvas paint function
 		for (Primitive p : mDataStore.mPrimitiveList) {
@@ -115,6 +116,19 @@ public class WhiteBoardView extends View {
 			} else {
 				c.drawPoint(firstPointX, firstPointY, mPaint);
 			}
+		}
+
+		if (mDrawIp != null) {
+			Paint text = new Paint();
+			text.setColor(Color.BLACK);
+			text.setTextAlign(Paint.Align.CENTER);
+			text.setAntiAlias(true);
+			text.setDither(true);
+			text.setSubpixelText(true);
+			text.setShadowLayer(3, 0, 0, Color.WHITE);
+			// TODO: Calculate this sensibly
+			text.setTextSize(50);
+			c.drawText(mDrawIp, (float)mWidth/2, (float)mHeight/2, text);
 		}
 	}
 
@@ -175,6 +189,11 @@ public class WhiteBoardView extends View {
 			mX = x;
 			mY = y;
 		}
+		invalidate();
+	}
+
+	protected void setDrawIp(String drawIp) {
+		mDrawIp = drawIp;
 		invalidate();
 	}
 
