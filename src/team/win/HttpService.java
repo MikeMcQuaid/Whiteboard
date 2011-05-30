@@ -119,7 +119,8 @@ public class HttpService extends Service {
 			if (dataStore != null && cacheTime != dataStore.getCacheTime() ) {
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("application/json");
-				response.getWriter().print(dataStore.getAllPrimitivesAsJSON());
+				response.addHeader("Content-Encoding", "gzip");
+				dataStore.writeAllPrimitivesAsJSONGzipped(response.getOutputStream());
 			} else {
 				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			}

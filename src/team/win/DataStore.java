@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.zip.GZIPOutputStream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +15,7 @@ import org.json.JSONObject;
 public class DataStore {
 	protected LinkedList<Primitive> mPrimitiveList;
 	private float mAspectRatio;
-	transient String mJSONCache;
+	transient byte[] mJSONCache;
 	transient long mJSONCacheTime;
 
 	public DataStore() {
@@ -51,7 +52,7 @@ public class DataStore {
 		return mJSONCacheTime;
 	}
 
-	public synchronized String getAllPrimitivesAsJSON() {
+	public synchronized void writeAllPrimitivesAsJSONGzipped(OutputStream os) {
 		if (mJSONCacheTime == 0) {
 			try {
 				JSONArray primitives = new JSONArray();
@@ -72,13 +73,22 @@ public class DataStore {
 				o.put("primitives", primitives);
 				long time = System.nanoTime();
 				o.put("cacheTime", time);
-				mJSONCache = o.toString();
+
+				mJSONCache = o.toString().getBytes();
 				mJSONCacheTime = time;
 			} catch (JSONException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		return mJSONCache;
+
+		try {
+			GZIPOutputStream gos = new GZIPOutputStream(os);
+			gos.write(mJSONCache);
+			gos.close();
+			os.flush();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void serializeDataStore(OutputStream outputStream) throws IOException {
