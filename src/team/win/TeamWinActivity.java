@@ -241,7 +241,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 				subtitle = "Starts a new white board session";
 			} else {
 				Date date = new Date(existingWhiteBoards.get(position - 1).lastModified * 1000L);
-				title = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
+				title = DateFormat.getTimeFormat(TeamWinActivity.this).format(date);
+				title += " " + DateFormat.getDateFormat(TeamWinActivity.this).format(date);
 				subtitle = existingWhiteBoards.get(position - 1).title;
 			}
 			
