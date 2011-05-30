@@ -192,14 +192,6 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		intent.setClass(this, HttpService.class);
 		return intent;
 	}
-	
-	/**
-	 * Displays the remote URL in the activity to access the white board.
-	 */
-	private void displayRemoteUrl() {
-		TextView remoteUrlTextView = (TextView) findViewById(R.id.header_remoteurl);
-		remoteUrlTextView.setText(Utils.getFormattedUrl(getResources()));
-	}
 
 	@Override
 	public void dataChanged() {
