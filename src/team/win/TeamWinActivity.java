@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.DateFormat;
@@ -26,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -242,6 +245,8 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 				subtitle = DateFormat.getDateFormat(TeamWinActivity.this).format(date);
 			}
 			
+			Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+			((ImageView) convertView.findViewById(R.id.preview_whiteboard)).setImageBitmap(icon);
 			((TextView) convertView.findViewById(R.id.title_whiteboard)).setText(title);
 			((TextView) convertView.findViewById(R.id.subtitle_whiteboard)).setText(subtitle);
 			
