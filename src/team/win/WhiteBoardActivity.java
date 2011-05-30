@@ -265,8 +265,6 @@ public class WhiteBoardActivity extends Activity {
 			// data file as we need the white board id to create the data file.
 			if (whiteBoard == null) {
 				whiteBoard = new WhiteBoard();
-				whiteBoard.title = getResources().getString(
-						R.string.label_defaultWhiteBoardTitle);
 				databaseHelper.addWhiteBoard(whiteBoard);
 			}
 
