@@ -30,7 +30,7 @@
 	<string name="button_cancel">Cancel</string>
 	
 	<!-- Info, confirmation and error messages. -->
-	<string name="error_remoteurl">Error getting remote URL</string>
+	<string name="error_remoteurl">Network connection needed</string>
 	<string name="error_noExternalStorage">External storage is not available.</string>
 	<string name="error_savingWhiteBoard">Failed to save the white board.</string>
 	
