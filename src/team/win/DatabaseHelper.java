@@ -145,7 +145,7 @@ public class DatabaseHelper {
 			// Contacts table
 			String createContactsTableSQL = "CREATE TABLE " + WhiteBoardsTable.TABLE_NAME + " (" +
 				WhiteBoardsTable.ID + " INTEGER PRIMARY KEY NOT NULL, " +
-				WhiteBoardsTable.TITLE + " TEXT NOT NULL, " +
+				WhiteBoardsTable.TITLE + " TEXT, " +
 				WhiteBoardsTable.LAST_MODIFIED + " INTEGER NOT NULL" +
 				");";
 			database.execSQL(createContactsTableSQL);
