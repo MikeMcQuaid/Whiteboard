@@ -6,8 +6,6 @@ package com.appleton5.android.utils;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import team.win.Utils;
-
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -17,7 +15,7 @@ import android.util.Log;
  */
 public class StorageUtils {
 	
-	private static final String TAG = Utils.buildLogTag(StorageUtils.class);
+	private static final String TAG = LogUtils.generateTag("Library", StorageUtils.class);
 	
 	// References to methods introduced in API 8 for retrieving application directories on external
 	// storage. If they are non-null then we are running on a 2.2+ device and should use these methods
