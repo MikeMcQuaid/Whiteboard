@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="jetty-all-7.3.0.v20110203.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/jetty-all-7.3.0.v20110203.jar!/"/>
+	</lib>
+	<lib name="commons-io-2.0.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/commons-io-2.0.1.jar!/"/>
+	</lib>
+	<lib name="servlet-api-2.5.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/servlet-api-2.5.jar!/"/>
+	</lib>
+	<lib name="json.jar" scope="COMPILE">
+		<srcroot url="jar://$MODULE_DIR$/lib/src/json.zip!/"/>
+		<relative-module-src project-related="jar://$PROJECT_DIR$/lib/src/json.zip!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/json.jar!/"/>
+	</lib>
+</component>
