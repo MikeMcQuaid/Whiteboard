@@ -10,6 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.appleton5.whiteboard.DatabaseHelper;
+import com.appleton5.whiteboard.Whiteboard;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
+import com.appleton5.whiteboard.WhiteboardManager;
 
 public class WhiteBoardActivity extends Activity {
 
@@ -58,8 +62,8 @@ public class WhiteBoardActivity extends Activity {
 
 	private DataStore mDataStore = new DataStore();
 	private WhiteBoardView mWhiteBoardView;
-	private DatabaseHelper databaseHelper;
-	private WhiteBoard whiteBoard;
+    private WhiteboardManager whiteboardManager;
+	private Whiteboard whiteBoard;
 
 	private enum StrokeWidth {
 		NARROW(5, "Narrow"), NORMAL(15, "Medium"), THICK(25, "Thick"), ;
@@ -98,9 +102,9 @@ public class WhiteBoardActivity extends Activity {
 			setTheme((Integer) holoThemeId);
 		}
 
-		databaseHelper = new DatabaseHelper(this);
+        whiteboardManager = new WhiteboardManager(this);
 		if (getIntent().hasExtra("ID")) {
-			whiteBoard = databaseHelper.getWhiteBoard(getIntent().getLongExtra(
+			whiteBoard = whiteboardManager.getWhiteboard(getIntent().getLongExtra(
 					"ID", -1));
 			try {
 				loadFromSdCard();
@@ -264,14 +268,14 @@ public class WhiteBoardActivity extends Activity {
 			// entry before saving the
 			// data file as we need the white board id to create the data file.
 			if (whiteBoard == null) {
-				whiteBoard = new WhiteBoard();
-				databaseHelper.addWhiteBoard(whiteBoard);
+				whiteBoard = new Whiteboard();
+				whiteboardManager.addWhiteboard(whiteBoard);
 			}
 
 			saveToSdCard();
 
 			whiteBoard.lastModified = (int) (System.currentTimeMillis() / 1000L);
-			databaseHelper.addWhiteBoard(whiteBoard);
+			whiteboardManager.addWhiteboard(whiteBoard);
 		} catch (IOException e) {
 			new AlertDialog.Builder(this)
 					.setCancelable(false)

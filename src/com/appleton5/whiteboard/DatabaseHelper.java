@@ -1,10 +1,14 @@
 /**
- * Copyright 2011 TeamWin
+ * Copyright 2011 Appleton 5 Software. All rights reserved.
  */
-package team.win;
+package com.appleton5.whiteboard;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.appleton5.android.utils.LogUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,10 +16,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import team.win.R;
 
 public class DatabaseHelper {
 
-	private static final String TAG = "TW_DatabaseHelper";
+	private static final String TAG = LogUtils.generateTag("Whiteboard", DatabaseHelper.class);
 	private static final String DATABASE_NAME = "teamwin.db";
 	private static final int DATABASE_VERSION = 1;
 	
@@ -69,14 +74,14 @@ public class DatabaseHelper {
 		database = null;
 	}
 	
-	public List<WhiteBoard> getWhiteBoards() {
+	public List<Whiteboard> getWhiteBoards() {
 		checkConnectionOpen();
-		List<WhiteBoard> whiteBoards = new LinkedList<WhiteBoard>();
+		List<Whiteboard> whiteBoards = new LinkedList<Whiteboard>();
 		
 		// For each row in the white boards table we initialise a WhiteBoard object.
 		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, null, null, null, null, null);
 		while (cursor.moveToNext()) {
-			WhiteBoard nextWhiteBoard = new WhiteBoard();
+			Whiteboard nextWhiteBoard = new Whiteboard();
 			nextWhiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
 			nextWhiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
 			nextWhiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
@@ -87,13 +92,13 @@ public class DatabaseHelper {
 		return whiteBoards;
 	}
 	
-	public WhiteBoard getWhiteBoard(long id) {
+	public Whiteboard getWhiteBoard(long id) {
 		checkConnectionOpen();
 		
 		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)}, null, null, null);
 		try {
 			if (cursor.moveToNext()) {
-				WhiteBoard whiteBoard = new WhiteBoard();
+				Whiteboard whiteBoard = new Whiteboard();
 				whiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
 				whiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
 				whiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
@@ -106,7 +111,7 @@ public class DatabaseHelper {
 		}
 	}
 	
-	public void addWhiteBoard(WhiteBoard whiteBoard) {
+	public void addWhiteBoard(Whiteboard whiteBoard) {
 		checkConnectionOpen();
 		
 		ContentValues content = new ContentValues();
@@ -134,21 +139,31 @@ public class DatabaseHelper {
 	
 	private static class OpenHelper extends SQLiteOpenHelper {
 
+		private String databaseCreateSql;
+		
 		OpenHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+            // Load the database creation SQL.
+            // Loaded here as we have access to the Context object.
+			InputStreamReader inputStreamReader = new InputStreamReader(context.getResources().openRawResource(R.raw.database_create_sql));
+            StringBuffer stringBuffer = new StringBuffer();
+            int currentChar;
+            try {
+                while ((currentChar = inputStreamReader.read()) >= 0) {
+                    stringBuffer.append(currentChar);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, e.getLocalizedMessage());
+            }
+            databaseCreateSql = stringBuffer.toString();
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase database) {
 			Log.i(TAG, "Creating database tables");
 			
-			// Contacts table
-			String createContactsTableSQL = "CREATE TABLE " + WhiteBoardsTable.TABLE_NAME + " (" +
-				WhiteBoardsTable.ID + " INTEGER PRIMARY KEY NOT NULL, " +
-				WhiteBoardsTable.TITLE + " TEXT, " +
-				WhiteBoardsTable.LAST_MODIFIED + " INTEGER NOT NULL" +
-				");";
-			database.execSQL(createContactsTableSQL);
+			database.execSQL(databaseCreateSql);
 			
 			Log.i(TAG, "Database tables successfully created");
 		}
@@ -159,8 +174,11 @@ public class DatabaseHelper {
 		}
 		
 	}
-	
-	private static class WhiteBoardsTable {
+
+    /**
+     * Whiteboards table identifiers, useful for safely interacting with the database.
+     */
+	public static class WhiteBoardsTable {
 		public static final String TABLE_NAME = "Whiteboards";
 		public static final String ID = "Id";
 		public static final String TITLE = "Title";

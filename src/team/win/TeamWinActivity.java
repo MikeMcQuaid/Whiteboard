@@ -6,6 +6,9 @@ package team.win;
 import java.util.Date;
 import java.util.List;
 
+import com.appleton5.whiteboard.DatabaseHelper;
+import com.appleton5.whiteboard.Whiteboard;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -31,28 +34,29 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.appleton5.whiteboard.WhiteboardManager;
 
-public class TeamWinActivity extends ListActivity implements DatabaseHelper.Listener {
+public class TeamWinActivity extends ListActivity implements WhiteboardManager.Listener {
 	
 	@SuppressWarnings("unused")
 	private static final String TAG = Utils.buildLogTag(TeamWinActivity.class);
 	
 	private static final int ID_CONTEXTMENU_CHANGE_TITLE = 0;
 	private static final int ID_CONTEXTMENU_DELETE_WHITEBOARD = 1;
-	
-	private DatabaseHelper databaseHelper;
+
+	private WhiteboardManager whiteboardManager;
 	private WhiteBoardListAdapter listAdapter;
-	private List<WhiteBoard> existingWhiteBoards;
+	private List<Whiteboard> existingWhiteBoards;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
-		databaseHelper = new DatabaseHelper(this);
-		existingWhiteBoards = databaseHelper.getWhiteBoards();
-		databaseHelper.addListener(this);
+
+		whiteboardManager = new WhiteboardManager(this);
+		existingWhiteBoards = whiteboardManager.getWhiteboards();
+		whiteboardManager.addListener(this);
 		listAdapter = new WhiteBoardListAdapter();
 		setListAdapter(listAdapter);
 		
@@ -86,7 +90,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	@Override
 	protected void onResume() {
 		super.onResume();
-		existingWhiteBoards = databaseHelper.getWhiteBoards();
+		existingWhiteBoards = whiteboardManager.getWhiteboards();
 		dataChanged();
 	}
 
@@ -133,7 +137,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 		case ID_CONTEXTMENU_CHANGE_TITLE:
 			final EditText inputField = new EditText(this);
 			final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-			final WhiteBoard currentWhiteBoard = existingWhiteBoards.get((int) info.id - 1);
+			final Whiteboard currentWhiteBoard = existingWhiteBoards.get((int) info.id - 1);
 			inputField.setText(currentWhiteBoard.title);
 			
 			new AlertDialog.Builder(this)
@@ -143,7 +147,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						currentWhiteBoard.title = inputField.getText().toString();
-						databaseHelper.addWhiteBoard(currentWhiteBoard);
+						whiteboardManager.addWhiteboard(currentWhiteBoard);
 						dialog.dismiss();
 					}
 				})
@@ -163,7 +167,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-						databaseHelper.deleteWhiteBoard(existingWhiteBoards.get((int) info.id - 1).id);
+						whiteboardManager.deleteWhiteboard(existingWhiteBoards.get((int) info.id - 1).id);
 						dialog.dismiss();
 					}
 				})
@@ -183,7 +187,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		databaseHelper.removeListener(this);
+		whiteboardManager.removeListener(this);
 		
 		if (isFinishing()) {
 			stopService(makeServiceIntent());
@@ -198,7 +202,7 @@ public class TeamWinActivity extends ListActivity implements DatabaseHelper.List
 
 	@Override
 	public void dataChanged() {
-		existingWhiteBoards = databaseHelper.getWhiteBoards();
+		existingWhiteBoards = whiteboardManager.getWhiteboards();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
