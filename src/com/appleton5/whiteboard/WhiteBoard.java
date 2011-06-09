@@ -1,9 +1,9 @@
 /**
- * Copyright 2011 TeamWin
+ * Copyright 2011 Appleton 5 Software. All rights reserved.
  */
-package team.win;
+package com.appleton5.whiteboard;
 
-public class WhiteBoard {
+public class Whiteboard {
 
 	public long id = -1;
 	public String title;

@@ -10,9 +10,7 @@ import java.util.List;
 
 import com.appleton5.android.utils.LogUtils;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -49,21 +47,19 @@ public class DatabaseHelper {
 	}
 	
 	/**
-	 * Opens a writable connection to the database.
+	 * Opens a writable connection to the database if not already open.
 	 */
 	private void open() {
-		openHelper = new OpenHelper(context);
-		database = openHelper.getWritableDatabase();
-	}
-	
-	/**
-	 * Checks the database connection is open, opening it if it is not.
-	 */
-	private void checkConnectionOpen() {
-		if (openHelper == null) {
-			open();
-		}
-	}
+        if (openHelper == null) {
+            openHelper = new OpenHelper(context);
+            database = openHelper.getWritableDatabase();
+        }
+    }
+
+    public SQLiteDatabase getDatabase() {
+        open();
+        return database;
+    }
 	
 	/**
 	 * Closes the database connection.
@@ -72,69 +68,6 @@ public class DatabaseHelper {
 		openHelper.close();
 		openHelper = null;
 		database = null;
-	}
-	
-	public List<Whiteboard> getWhiteBoards() {
-		checkConnectionOpen();
-		List<Whiteboard> whiteBoards = new LinkedList<Whiteboard>();
-		
-		// For each row in the white boards table we initialise a WhiteBoard object.
-		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, null, null, null, null, null);
-		while (cursor.moveToNext()) {
-			Whiteboard nextWhiteBoard = new Whiteboard();
-			nextWhiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
-			nextWhiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
-			nextWhiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
-			whiteBoards.add(nextWhiteBoard);
-		}
-		cursor.close();
-		
-		return whiteBoards;
-	}
-	
-	public Whiteboard getWhiteBoard(long id) {
-		checkConnectionOpen();
-		
-		Cursor cursor = database.query(WhiteBoardsTable.TABLE_NAME, null, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)}, null, null, null);
-		try {
-			if (cursor.moveToNext()) {
-				Whiteboard whiteBoard = new Whiteboard();
-				whiteBoard.id = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.ID));
-				whiteBoard.title = cursor.getString(cursor.getColumnIndex(WhiteBoardsTable.TITLE));
-				whiteBoard.lastModified = cursor.getInt(cursor.getColumnIndex(WhiteBoardsTable.LAST_MODIFIED));
-				return whiteBoard;
-			} else {
-				return null;
-			}
-		} finally {
-			cursor.close();
-		}
-	}
-	
-	public void addWhiteBoard(Whiteboard whiteBoard) {
-		checkConnectionOpen();
-		
-		ContentValues content = new ContentValues();
-		content.put(WhiteBoardsTable.TITLE, whiteBoard.title);
-		content.put(WhiteBoardsTable.LAST_MODIFIED, whiteBoard.lastModified);
-		
-		if (whiteBoard.id < 0) {
-			whiteBoard.id = database.insert(WhiteBoardsTable.TABLE_NAME, null, content);
-		} else {
-			database.update(WhiteBoardsTable.TABLE_NAME, content, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(whiteBoard.id)});
-		}
-		
-		for (DatabaseHelper.Listener listener : listeners) {
-			listener.dataChanged();
-		}
-	}
-	
-	public void deleteWhiteBoard(long id) {
-		checkConnectionOpen();
-		database.delete(WhiteBoardsTable.TABLE_NAME, WhiteBoardsTable.ID + "=?", new String[] {String.valueOf(id)});
-		for (DatabaseHelper.Listener listener : listeners) {
-			listener.dataChanged();
-		}
 	}
 	
 	private static class OpenHelper extends SQLiteOpenHelper {
@@ -151,7 +84,7 @@ public class DatabaseHelper {
             int currentChar;
             try {
                 while ((currentChar = inputStreamReader.read()) >= 0) {
-                    stringBuffer.append(currentChar);
+                    stringBuffer.append((char) currentChar);
                 }
             } catch (IOException e) {
                 Log.e(TAG, e.getLocalizedMessage());
@@ -178,7 +111,7 @@ public class DatabaseHelper {
     /**
      * Whiteboards table identifiers, useful for safely interacting with the database.
      */
-	public static class WhiteBoardsTable {
+	public static class WhiteboardsTable {
 		public static final String TABLE_NAME = "Whiteboards";
 		public static final String ID = "Id";
 		public static final String TITLE = "Title";
